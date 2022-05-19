@@ -1,0 +1,8 @@
+main_func.cpp:39:6:void main_func(uint16_t, char, uint8_t)	16	static
+main_func.cpp:97:6:void WaitForOptoStatus(uint8_t, uint8_t, uint8_t)	24	static
+main_func.cpp:113:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t)	16	static
+main_func.cpp:118:6:void RunStepperMod(uint8_t, long int, uint16_t, uint32_t)	24	static
+main_func.cpp:121:6:void StopStepper(uint8_t)	16	static
+main_func.cpp:125:19:HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+main_func.cpp:140:19:HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+main_func.cpp:162:6:void messege()	8	static

@@ -103,6 +103,8 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(1000);
 
+			Msgint(fl_er);
+
 			Msg("sol1 on...");
 	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
 			Pause(500);
@@ -120,8 +122,8 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 
 			Pause(500);
-			Msg("Start step motor...");							//проезжает N шагов и останавливается перед штампом
-	m5:		RunStepMotor(10000,120,1, - 1, 0 ,10, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+			Msg("SM do noga...");							//проезжает N шагов и останавливается перед штампом
+	m5:		RunStepMotor(10000,120,1, - 1, 0 ,100, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
 			Msg("SOL2_PRESS OFF...");
@@ -141,17 +143,17 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
 			Msg("MOT_CUT forvard...");
-	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 10,"m70");
+	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 100,"m70");
 			Pause(500);
 			Msg("MOT_CUT back...");
-	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 10,"m7");
+	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 100,"m7");
 
-
+			Msgint(fl_er);
 	////////////////////////////////////////////////////////////////
 
 
 			Pause(500);
-			Msg("Start Step Motor...");					//старт ШД на N шагов из входных параметров главной функции
+			Msg("Step Motor v champ...");					//старт ШД на N шагов из входных параметров главной функции
 	m8:		RunStepMotor(Steps,120,1, -1, 0 ,10, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
@@ -159,20 +161,21 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
 			Pause(500);
 
+			Msgint(fl_er);
 	//////////////////штамповка///////////////////////////////////////
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 100,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
 			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 100,"m0");
 			Pause(500);
 	//////////////////////////////////////////////////////////////////
 			//выход из штампа
 			Pause(500);
-			Msg("Start Step Motor...");	//старт ШД на N шагов
-	m18:	RunStepMotor(20000,120,1, -1, 0 ,10, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+			Msg("Step Motor OUT...");	//старт ШД на N шагов
+	m18:	RunStepMotor(20000,120,1, -1, 0 ,100, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 }
 
@@ -294,10 +297,11 @@ if(!fl_er){
 		count_step = 0;
 		break;
 		}
-		else if(count_100ms > timeout ){
-			Msg("MT_TMT");
-			fl_er = 1;
-			return MOT_TIMEOUT;
+		else if(count_100ms > 1000 ){
+			Msg("MT_TMT1_SM");
+			//fl_er = 1;
+			break;
+			//return MOT_TIMEOUT;
 		}
 	}
 
@@ -325,7 +329,7 @@ Msg("count_step = 0");
 		}
 			else if(count_100ms > timeout ){				//если превышен таймаут
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
-			Msg("MT_TMT");
+			Msg("MT_TMT2_ST");
 			fl_er = 1;
 			return MOT_TIMEOUT;
 		}
@@ -579,13 +583,14 @@ void TestDev(void){
 */
 
 
-	//штамп вниз(откр)(вывод А, вывод Б, шаги, код АЦП, номер оптодатчика, ожидаемый статус, таймаут)
-	RunMotor(MOT_SHTAMP, 60, -20000,  3000, kv_sht_open, 0 , 50,"m0");
-	Pause(500);
+/*
 	//шатмп вверх(закр)
-	RunMotor(MOT_SHTAMP, 60, 20000,  1000, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику
+	RunMotor(MOT_SHTAMP, 1000, 20000,  1000, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику
 	Pause(500);
-
+	//штамп вниз(откр)(вывод А, вывод Б, шаги, код АЦП, номер оптодатчика, ожидаемый статус, таймаут)
+	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+	Pause(500);
+*/
 
 /*
 	RunMotor(MOT_CUT, 120, 2000,  4000, 5, 0 , 50,"m0");
@@ -595,6 +600,10 @@ void TestDev(void){
 	Pause(500);
 
 */
+	RunMotor(MOT_MAGN, 1000, 2000,  -4000, opto_magn, 0 , 50,"m0");
+	Pause(500);
+
+
 
 	//puts("m4");
 	//RunMotor(DRAW_KD4_A,DRAW_KD4_B, 200, 1,  0, 3, 0 , TIMEOUT);

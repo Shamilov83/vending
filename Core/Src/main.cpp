@@ -207,8 +207,8 @@ int main(void)
 	  }
 	  else{
 
-		Service();
-
+		//Service();
+		 Main_func(10000,1,60);
 
 	  }
 

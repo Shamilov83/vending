@@ -144,7 +144,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 10,"m70");
 			Pause(500);
 			Msg("MOT_CUT back...");
-	m20:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_up, 0 , 10,"m7");
+	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 10,"m7");
 
 
 	////////////////////////////////////////////////////////////////

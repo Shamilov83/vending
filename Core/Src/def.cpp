@@ -141,10 +141,10 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
 			Msg("MOT_CUT forvard...");
-	m70:	RunMotor(MOT_CUT, 120, 10000,  4000, kv_cut_down, 0 , 10,"m70");
+	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 10,"m70");
 			Pause(500);
 			Msg("MOT_CUT back...");
-	m20:	RunMotor(MOT_CUT, 120, 10000,  4000, kv_cut_up, 0 , 10,"m7");
+	m20:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_up, 0 , 10,"m7");
 
 
 	////////////////////////////////////////////////////////////////
@@ -160,13 +160,13 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			Pause(500);
 
 	//////////////////штамповка///////////////////////////////////////
-			RunMotor(MOT_SHTAMP, 120, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 5, 20000,  500, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 120, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
 			Pause(500);
 	//////////////////////////////////////////////////////////////////
 			//выход из штампа
@@ -187,7 +187,7 @@ void PrintFoto(void){
 /*функция подачи магнита*/
 void MagnFrv(void){
 
-	m0:		RunMotor(MOT_MAGN, 120, 10000,  4000, 2, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
+	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, 2, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 			Pause(500);
 }
 
@@ -288,11 +288,16 @@ if(!fl_er){
 /*
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
-	while(1){
+	for(;;){
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		if(bitRead(input_UR, opto_print_in) == 0){
 		count_step = 0;
 		break;
+		}
+		else if(count_100ms > timeout ){
+			Msg("MT_TMT");
+			fl_er = 1;
+			return MOT_TIMEOUT;
 		}
 	}
 
@@ -335,9 +340,9 @@ Msg("count_step = 0");
 /*
  * функция запуска колекторного двигателя
  * входные параметры(порты,скорость,кол-во шагов, уставка датчика тока, оптодатчик,статус,таймаут)
- * скорость(об/мин)
+ * скорость: 1-1000 (коэффициент заполнения)
  * количество шагов для штампа указывается необходимое. шаги стчитываются с энкодера. для других КД кол-во шагов 0
- * для ДТ диапазон измерений 0-2049 и 2048-4096 в зависимости от направления тока.
+ * для ДТ диапазон измерений 0-2049 и 2048-4096 в зависимости от направления тока. усли отрицат, игнор
  * оптодатчик - бит input_UR, если значние отрицательное, то датчик не контролируется
  * статус - ожидаемый статус оптодатчика при стабатывании. 0 - открыт, 1 - закрыт
  * таймаут - время ожидания срабатывания ДТ или оптодатчика (С)
@@ -347,7 +352,7 @@ Msg("count_step = 0");
  */
 
 
-StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B, uint16_t speed_kd, long steps_ust,  uint16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt){
+StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B, uint16_t speed_kd, long steps_ust,  int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt){
 
 if(!fl_er){				//если не установлен флаг ошибки
 	WriteMtk(mt);
@@ -356,11 +361,6 @@ count_taho = 0;
 timeout = (timeout*100);
 uint16_t  pediod_T3;
 pediod_T3 = 1000 ;
-uint8_t cod;
-uint8_t deb = 0;
-uint8_t port;
-uint8_t fl_deb = 0;
-
 
 if(num_opt >= 0 ){							//если используется датчик
 	PortRead(&hi2c1, adr_ur_sens,&input_UR);
@@ -383,10 +383,9 @@ if(num_opt >= 0 ){							//если используется датчик
 	HAL_Delay(5);
 	//запуск ШИМ
 	TIM3->ARR = pediod_T3;
-	TIM3->CCR1 = pediod_T3/1;
+	TIM3->CCR1 = speed_kd;
 	//HAL_TIM_Base_Start_IT(&htim3);
 	//ждем когда что-то сработает
-
 
 		for(;;){
 
@@ -400,17 +399,20 @@ if(num_opt >= 0 ){							//если используется датчик
 						}
 					}
 						Pause(500);
+					if(current > 0){
 						if(cod_ADC_CS >= current){
 						Msg("cod_ADC_CS >= current");
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						return MOT_OK;
+						}
 					}
-						else if(count_taho >= steps_ust){
+
+						if(count_taho >= steps_ust){
 						Msg("count_taho >= steps_ust");
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						return MOT_OK;
 					}
-						else if(count_100ms > timeout ){				//если превышен таймаут
+						if(count_100ms > timeout ){				//если превышен таймаут
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						Msg("MT_TMT");
 						fl_er = 1;

@@ -172,7 +172,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			//выход из штампа
 			Pause(500);
 			Msg("Start Step Motor...");	//старт ШД на N шагов
-	m18:	RunStepMotor(5000,120,1, -1, 0 ,10, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	m18:	RunStepMotor(20000,120,1, -1, 0 ,10, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 }
 

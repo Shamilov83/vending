@@ -94,100 +94,85 @@ uint16_t usart_buf[10];		//приемный буфер
  */
 
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
-	//printf("count_100ms = %d\r\n", count_100ms);
 
-	//RunMotor(MOT_MAGN, 5, -2000,  3000, 3, 0 , 50);
+			Msg("RunMagn");
+	m0:		RunMotor(MOT_MAGN, 120, 10000,  4000, opto_magn, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
+			Msg("photo waiting");
+	m1:		WaitForOptoStatus(opto_print_in,1,60,"m1");						// ожидание фото из принтера
 
-		Msg("Start...");
+			Pause(1000);
 
-//m1:		WaitForOptoStatus(0,0,4000,"m1"); 		// Оптрон наличия бумаги
-		WaitForOptoStatus(0,2,400,"m1");
+			Msg("sol1 on...");
+	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
+			Pause(500);
+			Solenoid(SOL1_ALIGN,0,"m2");
+			Pause(500);
+			Solenoid(SOL1_ALIGN,1,"m2");
 
-		Pause(3000);
-		Msg("sol1 on...");
-m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
-		Pause(500);
-		Solenoid(SOL1_ALIGN,0,"m2");
-		Pause(500);
-		Solenoid(SOL1_ALIGN,1,"m2");
+			Pause(1000);
+			Msg("sol2 on...");
+	m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
 
-
-
-		Pause(1000);
-		Msg("sol2 on...");
-m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
-
-		Pause(1000);
-		Msg("sol1 off...");
-m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
-
-		Pause(500);
-		Msg("Start step motor...");
-m5:		RunStepMotor(2000,120,1, 2, 1 ,100, "m5"); 			//(steps,speed,accel,num_opt,status,timeout)
-
-		Pause(500);
-		Msg("SOL2_PRESS OFF...");
-		Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
-
-		Pause(500);
-		Msg("Step motor revers...");
-m6:		RunStepMotor(-100,120,1, 2, 0 ,100, "m6");//ШД назад
-
-		Pause(500);
-		Msg("SOL3_GLUE on...");
-m9:		Solenoid(SOL3_GLUE,1,"m9");
-
-		Pause(500);
-		Msg("MOT_CUT forvard...");
-m0:		RunMotor(MOT_CUT, 120, 10000,  4000, 5, 0 , 10,"m7");
+			Pause(1000);
+			Msg("sol1 off...");
+	m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
 
 
-		Pause(500);
-		Msg("MOT_CUT back...");
-m20:	RunMotor(MOT_CUT, 120, 10000,  4000, 3, 0 , 10,"m7");
+			Pause(500);
+			Msg("Start step motor...");							//проезжает N шагов и останавливается перед штампом
+	m5:		RunStepMotor(10000,120,1, - 1, 0 ,10, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
-		Pause(500);
-		Msg("Start Step Motor...");
-m8:		RunStepMotor(Steps,60,1, 1, 0 ,100, "m8");			//
+			Pause(500);
+			Msg("SOL2_PRESS OFF...");
+			Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
 
-		Pause(500);
-		Msg("SOL3_GLUE off...");
-m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание
-		Pause(500);
+			/*
+			Pause(500);
+			Msg("Step motor revers...");
+	m6:		RunStepMotor(-100,120,1, 2, 0 ,100, "m6");//ШД назад
+			*/
+
+			Pause(500);
+			Msg("SOL3_GLUE on...");
+	m9:		Solenoid(SOL3_GLUE,1,"m9");		//склейка
+
+	////////////////////////*отрезка*///////////////////////////////
+	/////////////////////////////////////////////////////////////////
+			Pause(500);
+			Msg("MOT_CUT forvard...");
+	m70:	RunMotor(MOT_CUT, 120, 10000,  4000, kv_cut_down, 0 , 10,"m70");
+			Pause(500);
+			Msg("MOT_CUT back...");
+	m20:	RunMotor(MOT_CUT, 120, 10000,  4000, kv_cut_up, 0 , 10,"m7");
 
 
-		Msg("Sol4 on...");
-m11:	Solenoid(SOL4_EJECT,1,"m11");
+	////////////////////////////////////////////////////////////////
 
 
-m13:	Solenoid(SOL4_EJECT,0,"m13");
-m14:	Pause(1000);
+			Pause(500);
+			Msg("Start Step Motor...");					//старт ШД на N шагов из входных параметров главной функции
+	m8:		RunStepMotor(Steps,120,1, -1, 0 ,10, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
+			Pause(500);
+			Msg("SOL3_GLUE off...");
+	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
+			Pause(500);
 
-m15:	Pause(8000);
-m16:	Solenoid(SOL2_PRESS,1,"m16");
-
-m17:	Solenoid(SOL3_GLUE,1,"m17");
-m18:	Pause(1000);
-m19:	Solenoid(SOL1_ALIGN,0,"m19");
-m80:	Pause(1000);
-m21:	Solenoid(SOL1_ALIGN,1,"m21");
-		Pause(1000);
-m23:	Solenoid(SOL1_ALIGN,0,"m23");
-m24:	Pause(5000);
-
-m27:	Pause(17000);
-m28:	Solenoid(SOL1_ALIGN, 0,"m28");
-m29:	Solenoid(SOL1_ALIGN, 1,"m29");
-m30:	Pause(4000);
-m31:	Solenoid(SOL1_ALIGN, 0,"m31");
-m32:	Pause(2000);
-m33:	Solenoid(SOL1_ALIGN, 1,"m33");
-m34:	Pause(2250);
-m35:	Solenoid(SOL1_ALIGN,0,"m35");
-m36:	Pause(2000);
-
+	//////////////////штамповка///////////////////////////////////////
+			RunMotor(MOT_SHTAMP, 120, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			Pause(500);
+			//шатмп вверх(закр)
+			RunMotor(MOT_SHTAMP, 5, 20000,  500, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			Pause(500);
+			//штамп вниз(откр)
+			RunMotor(MOT_SHTAMP, 120, -20000,  3000, kv_sht_open, 0 , 50,"m0");
+			Pause(500);
+	//////////////////////////////////////////////////////////////////
+			//выход из штампа
+			Pause(500);
+			Msg("Start Step Motor...");	//старт ШД на N шагов
+	m18:	RunStepMotor(5000,120,1, -1, 0 ,10, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 }
 
@@ -208,35 +193,33 @@ void MagnFrv(void){
 
 
 /*
- * Функция контроля оптодатчика при выходе фотографии из принтера
- * если за время таймаута не произошло  событие, сообщить об ошибке
- * цифровой вход подтянут к питанию. При срабатывании шунтируется. status для оптодатчиков всегда = 0.
- *
+ * Функция ожидания фотографии из принтера
+ * если за время таймаута фото не вышло из принтера,
+ * то установить флаг ошибки и выйти. При срабатывании шунтируется.
+ * 1 - наличие фото, 0 - отсутствие
  */
-
-
 void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char* mt){
 	if(!fl_er){
 		WriteMtk(mt);
-	uint8_t fl = 0;
-	timeout = (timeout*10);
-	count_100ms = 0;
-	while(!fl ){
-		PortRead(&hi2c1, adr_ur_sens,&input_UR);
-		if(count_100ms > timeout){
-			fl_er = 1;		//если счетчик больше таймаута
-			//err_tm = 1;
-			//Msg("Timeout opto1");
-			return;
-		}
-		else{
+		timeout = (timeout*100);
+		count_100ms = 0;
+
+		for(;;){
+			PortRead(&hi2c1, adr_ur_sens,&input_UR);
+
 			if(bitRead(input_UR, num_opt) == status) {
 				Msg("Event opto1");
-				fl=1;	//
+				break;
+			}
+			else if(count_100ms > timeout){
+				Msg("Timeout opto1");
+				fl_er = 1;		//если счетчик больше таймаута
+				return;
 			}
 
+			HAL_Delay(10);
 		}
-	}
+
 	}
 }
 
@@ -249,10 +232,6 @@ status:
 3 - 11.
 
 */
-
-
-
-
 
 /*функция включения соленойда
  * status: 1-вкл/0-выкл
@@ -271,51 +250,51 @@ void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
 // 200 шагов/оборот
 //
 /*
+ *
  * значение регистра
  * (1/скор)*(част.такт/prescaller)
  *
  *возвращаемые значения
- * MOT_OK - фугкция выполнена
+ * MOT_OK - функция выполнена
  * MOT_ERROR -
  * MOT_BUSY - в процессе выполнения
  * MOT_TIMEOUT - превышено время ожидания срабатывания оптодатчика или датчика тока
  *
  * status: 0 - открыт, 1 - закрыт.
+ * если оптодатчик указан со знаком минул, он не контролируется
  */
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt){
 if(!fl_er){
 	WriteMtk(mt);
-if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
-else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
+	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
+	else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
 
-pediod_T1 = ((F_cnt*10)/(speed*200)) ;
+	pediod_T1 = ((F_cnt*10)/(speed*200)) ;
 
-count_100ms = 0;
-count_step = 0;
+	count_100ms = 0;
+	count_step = 0;
 
-pulse_T1 = pediod_T1/8;
-accel_st = accel;
+	pulse_T1 = pediod_T1/8;
+	accel_st = accel;
 
-timeout = (timeout*100);//Cек
+	timeout = (timeout*100);//Cек
 
-step = abs(steps);
-//старт ШД
-TIM1->ARR = pediod_T1;
-TIM1->CCR1 = pulse_T1;
-HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
+	step = abs(steps);
+	//старт ШД
+	TIM1->ARR = pediod_T1;
+	TIM1->CCR1 = pulse_T1;
+	HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
 
 /*
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
-
-
-while(1){
-	PortRead(&hi2c1, adr_ur_sens,&input_UR);
-	if(bitRead(input_UR, opto_print_in) == 0){
+	while(1){
+		PortRead(&hi2c1, adr_ur_sens,&input_UR);
+		if(bitRead(input_UR, opto_print_in) == 0){
 		count_step = 0;
 		break;
+		}
 	}
-}
 
 Msg("count_step = 0");
 
@@ -374,7 +353,7 @@ if(!fl_er){				//если не установлен флаг ошибки
 	WriteMtk(mt);
 count_100ms = 0;		//обнулить счетчик таймаута.
 count_taho = 0;
-timeout = (timeout*10);
+timeout = (timeout*100);
 uint16_t  pediod_T3;
 pediod_T3 = 1000 ;
 uint8_t cod;
@@ -536,6 +515,7 @@ void executeCommand(string data_rx)
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
 }
+
 
 
 //функция формирования строковой переменной

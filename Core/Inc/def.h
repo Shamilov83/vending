@@ -137,9 +137,9 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define opto_print_in 0
 #define opto_print_2 1
 #define opto_magn 2
-#define cut_up 3
+#define kv_cut_up 3
 #define kv_sht_open 4
-#define cut_down 5
+#define kv_cut_down 5
 #define opto_6 6
 #define opto_7 7
 

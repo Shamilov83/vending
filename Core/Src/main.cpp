@@ -129,6 +129,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     }
 }
 
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -182,8 +185,8 @@ int main(void)
     //прочитать данные с EEPROM. если есть метка, то начать с неё.
 
 
-
-
+    PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
+    HAL_Delay(500);
   /* USER CODE END 2 */
 
   /* Infinite loop */

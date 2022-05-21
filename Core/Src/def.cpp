@@ -94,18 +94,18 @@ uint16_t usart_buf[10];		//приемный буфер
  */
 
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
+/*проверку флага ошибки нужно производить перед вызовом функции*/
+			Msg("----Start----");
+	m0:		if(!fl_er) RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
-			Msg("RunMagn");
-	m0:		RunMotor(MOT_MAGN, 120, 10000,  4000, opto_magn, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
-			Msg("photo waiting");
-	m1:		WaitForOptoStatus(opto_print_in,1,60,"m1");						// ожидание фото из принтера
+	m1:		if(!fl_er)WaitForOptoStatus(opto_print_in,1,10,"m1");						// ожидание фото из принтера
 
 			Pause(1000);
 
 			Msgint(fl_er);
 
-			Msg("sol1 on...");
+
 	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
 			Pause(500);
 			Solenoid(SOL1_ALIGN,0,"m2");
@@ -113,20 +113,20 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			Solenoid(SOL1_ALIGN,1,"m2");
 
 			Pause(1000);
-			Msg("sol2 on...");
+
 	m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
 
 			Pause(1000);
-			Msg("sol1 off...");
+
 	m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
 
 
 			Pause(500);
-			Msg("SM do noga...");							//проезжает N шагов и останавливается перед штампом
-	m5:		RunStepMotor(10000,120,1, - 1, 0 ,100, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+									//проезжает N шагов от начала и останавливается перед штампом
+	m5:		if(!fl_er)RunStepMotor(10000,120,1, - 1, 0 ,10, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
-			Msg("SOL2_PRESS OFF...");
+
 			Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
 
 			/*
@@ -136,46 +136,46 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			*/
 
 			Pause(500);
-			Msg("SOL3_GLUE on...");
+
 	m9:		Solenoid(SOL3_GLUE,1,"m9");		//склейка
 
 	////////////////////////*отрезка*///////////////////////////////
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
-			Msg("MOT_CUT forvard...");
-	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 100,"m70");
+
+	m70:	if(!fl_er)RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 10,"m70");
 			Pause(500);
-			Msg("MOT_CUT back...");
-	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 100,"m7");
+
+	m20:	if(!fl_er)RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 10,"m7");
 
 			Msgint(fl_er);
 	////////////////////////////////////////////////////////////////
 
 
 			Pause(500);
-			Msg("Step Motor v champ...");					//старт ШД на N шагов из входных параметров главной функции
-	m8:		RunStepMotor(Steps,120,1, -1, 0 ,10, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+			//старт ШД на N шагов из входных параметров главной функции
+	m8:		if(!fl_er)RunStepMotor(Steps,120,1, -1, 0 ,10, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
-			Msg("SOL3_GLUE off...");
+
 	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
 			Pause(500);
 
 			Msgint(fl_er);
 	//////////////////штамповка///////////////////////////////////////
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 100,"m0");
+			if(!fl_er)RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 10,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			if(!fl_er)RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , 10,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 100,"m0");
+			if(!fl_er)RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 10,"m0");
 			Pause(500);
 	//////////////////////////////////////////////////////////////////
 			//выход из штампа
 			Pause(500);
-			Msg("Step Motor OUT...");	//старт ШД на N шагов
-	m18:	RunStepMotor(20000,120,1, -1, 0 ,100, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+				//старт ШД на N шагов
+	m18:	if(!fl_er)RunStepMotor(20000,120,1, -1, 0 ,10, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 }
 
@@ -202,7 +202,8 @@ void MagnFrv(void){
  * 1 - наличие фото, 0 - отсутствие
  */
 void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char* mt){
-	if(!fl_er){
+	if(fl_er == 0){
+		Msg("Wait opto");
 		WriteMtk(mt);
 		timeout = (timeout*100);
 		count_100ms = 0;
@@ -216,7 +217,9 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char
 			}
 			else if(count_100ms > timeout){
 				Msg("Timeout opto1");
+				Pause(10);
 				fl_er = 1;		//если счетчик больше таймаута
+				Msgint(fl_er);
 				return;
 			}
 
@@ -241,7 +244,10 @@ status:
  */
 
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
-	if(!fl_er){
+
+
+	if(fl_er == 0){
+		Msg("Sol_");
 		WriteMtk(mt);
 		if(status == 0) HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_RESET);
@@ -268,6 +274,7 @@ void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
  */
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt){
 if(!fl_er){
+	Msg("Start Step mot");
 	WriteMtk(mt);
 	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
 	else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
@@ -280,7 +287,7 @@ if(!fl_er){
 	pulse_T1 = pediod_T1/8;
 	accel_st = accel;
 
-	timeout = (timeout*100);//Cек
+	timeout = (timeout*10);//Cек
 
 	step = abs(steps);
 	//старт ШД
@@ -330,7 +337,9 @@ Msg("count_step = 0");
 			else if(count_100ms > timeout ){				//если превышен таймаут
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
 			Msg("MT_TMT2_ST");
+			Pause(10);
 			fl_er = 1;
+			Msgint(fl_er);
 			return MOT_TIMEOUT;
 		}
 
@@ -358,11 +367,12 @@ Msg("count_step = 0");
 
 StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B, uint16_t speed_kd, long steps_ust,  int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt){
 
-if(!fl_er){				//если не установлен флаг ошибки
+if(fl_er == 0){				//если не установлен флаг ошибки
+	Msg("Start KD");
 	WriteMtk(mt);
 count_100ms = 0;		//обнулить счетчик таймаута.
 count_taho = 0;
-timeout = (timeout*100);
+timeout = (timeout*10);
 uint16_t  pediod_T3;
 pediod_T3 = 1000 ;
 
@@ -420,6 +430,8 @@ if(num_opt >= 0 ){							//если используется датчик
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						Msg("MT_TMT");
 						fl_er = 1;
+						Pause(10);
+						Msgint(fl_er);
 						return MOT_TIMEOUT;
 					}
 

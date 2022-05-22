@@ -207,8 +207,8 @@ int main(void)
 	  }
 	  else{
 
-		  Service();
-		 //Main_func(10000,1,60);
+		  //Service();
+		 Main_func(10000,1,60);
 	  }
 
 HAL_Delay(5);

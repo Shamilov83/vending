@@ -177,6 +177,8 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 				//старт ШД на N шагов
 	m18:	RunStepMotor(20000,120,1, -1, 0 ,timeout, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
+
+
 }
 
 

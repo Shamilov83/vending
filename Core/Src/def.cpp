@@ -166,7 +166,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , 10,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 			//штамп вниз(откр)
 			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , timeout,"m0");

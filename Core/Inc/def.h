@@ -97,19 +97,21 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define DRAW_KD1_A GPIOA,GPIO_PIN_10
 #define DRAW_KD1_B GPIOA,GPIO_PIN_9
 #define MOT_SHTAMP  DRAW_KD1_A,DRAW_KD1_B
-//двигатель магнита
+
+//двигатель выброса. сторона А, сторона Б
 #define DRAW_KD2_A GPIOA,GPIO_PIN_8
 #define DRAW_KD2_B GPIOA,GPIO_PIN_15
-#define MOT_MAGN DRAW_KD2_A,DRAW_KD2_B
+#define MOT_EJECT DRAW_KD2_A,DRAW_KD2_B
+
 //двигатель ножа1
 #define DRAW_KD3_A GPIOB,GPIO_PIN_10
 #define DRAW_KD3_B GPIOB,GPIO_PIN_11
 #define MOT_CUT DRAW_KD3_A,DRAW_KD3_B
 
-//двигатель выброса. сторона А, сторона Б
+//двигатель магнита
 #define DRAW_KD4_A GPIOB,GPIO_PIN_1
 #define DRAW_KD4_B GPIOB,GPIO_PIN_0
-#define MOT_EJECT DRAW_KD4_A,DRAW_KD4_B
+#define MOT_MAGN DRAW_KD4_A,DRAW_KD4_B
 //соленойд выравнивателя
 #define SOL1_ALIGN GPIOA,GPIO_PIN_4
 //соленойд поджима

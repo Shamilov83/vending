@@ -47,7 +47,7 @@ void executeCommand(string data_rx);
 void Msg(string message);	//отправка сообщения в USB
 void Msgint(int val);		//отправка целочисленных данных в USB
 //флаги
-uint8_t fl_er = 0;				//флаг завершения с ошибкой
+uint8_t fl_er;				//флаг завершения с ошибкой
 uint8_t fl_rx;				//принята команда
 
 bool fl_run_pr = 0;			//флаг выпонения программы. выставляется после запуска
@@ -96,12 +96,14 @@ uint16_t usart_buf[10];		//приемный буфер
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 /*проверку флага ошибки нужно производить перед вызовом функции*/
 			Msg("----Start----");
-	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
 
-	m1:		WaitForOptoStatus(opto_print_in,1,timeout,"m1");						// ожидание фото из принтера
+	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
-			Pause(1000);
+
+	m1:		WaitForOptoStatus(opto_print_in,1,100,"m1");						// ожидание фото из принтера
+
+			//Pause(1000);
 
 			Msgint(fl_er);
 
@@ -123,7 +125,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(500);
 									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(10000,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	m5:		RunStepMotor(7500,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
 
@@ -185,7 +187,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 /*Программа печати фото без магнита*/
 void PrintFoto(void){
 	WaitForOptoStatus(0,0,4000,"m1"); 		// Оптрон наличия бумаги
-	RunStepMotor(200000,120,1, 2, 1 ,100, "m5");
+	RunStepMotor(30000,120,1, -2, 1 ,100, "m5");
 }
 
 
@@ -204,10 +206,12 @@ void MagnFrv(void){
  * 1 - наличие фото, 0 - отсутствие
  */
 void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char* mt){
-	if(fl_er == 0){
+	if(fl_er){
+	return;
+	}
 		Msg("Wait opto");
 		WriteMtk(mt);
-		timeout = (timeout*100);
+		timeout = (timeout*1000);
 		count_100ms = 0;
 
 		for(;;){
@@ -220,7 +224,7 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char
 			else if(count_100ms > timeout){
 				Msg("Timeout opto1");
 				Pause(10);
-				fl_er = 1;		//если счетчик больше таймаута
+				fl_er = true;		//если счетчик больше таймаута
 				Msgint(fl_er);
 				return;
 			}
@@ -228,7 +232,6 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char
 			HAL_Delay(10);
 		}
 
-	}
 }
 
 
@@ -325,11 +328,13 @@ Msg("count_step = 0");
 			PortRead(&hi2c1, adr_ur_sens,&input_UR);
 			if(bitRead(input_UR, num_opt) == status){
 				//if(fl_deb == status){
-				Msg("Status!");
+				Msgint(count_step);
 				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
 				return MOT_OK;
 			}
 		}
+
+
 		//if((count_step >= step) or (fl_deb == status)){
 			if(count_step >= step){
 			Msg("count_step >= step");
@@ -342,7 +347,7 @@ Msg("count_step = 0");
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
 			Msg("MT_TMT2_ST");
 			Pause(10);
-			fl_er = 1;
+			fl_er = true;
 			Msgint(fl_er);
 			return MOT_TIMEOUT;
 		}
@@ -436,7 +441,7 @@ if(num_opt >= 0 ){							//если используется датчик
 						if(count_100ms > timeout ){				//если превышен таймаут
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						Msg("MT_TMT");
-						fl_er = 1;
+						fl_er = true;
 						Pause(10);
 						Msgint(fl_er);
 						return MOT_TIMEOUT;
@@ -537,6 +542,9 @@ void executeCommand(string data_rx)
 	else if(command.find("MagnFrv()")!= string::npos){
 			MagnFrv();		//подача магнита
 	}
+	else if(command.find("Test()")!= string::npos){
+				TestDev();		//
+		}
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
 }
@@ -561,6 +569,11 @@ void ArreyRx(string data_rx){
 
 
 void TestDev(void){
+
+
+	RunStepMotor(7500,120,1, opto_magn, 1 ,100, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	Pause(2000);
+	RunStepMotor(2000,120,1, -opto_magn, 1 ,100, "m1");
 
 /*
 	Pause(3000);
@@ -618,10 +631,10 @@ void TestDev(void){
 	RunMotor(MOT_CUT, 5, -2000,  3000, 3, 0 , 50,"m0");
 	Pause(500);
 
-*/
+
 	RunMotor(MOT_MAGN, 1000, 2000,  -4000, opto_magn, 0 , 50,"m0");
 	Pause(500);
-
+*/
 
 
 	//puts("m4");

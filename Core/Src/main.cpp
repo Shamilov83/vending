@@ -186,7 +186,10 @@ int main(void)
 
 
     PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
+
     HAL_Delay(3000);
+    Msg("Srart programm");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -210,11 +213,11 @@ int main(void)
 		  Service();
 		 //Main_func(10000,1,60);
 
-		 /*
+/*
 		  PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		  if(bitRead(input_UR, opto_print_in) == 0) Msg("foto on");
 		  Pause(500);
-		  */
+*/
 	  }
 
 HAL_Delay(5);

@@ -103,31 +103,31 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 	m1:		WaitForOptoStatus(opto_print_in,1,100,"m1");						// ожидание фото из принтера
 
-			//Pause(1000);
+			Pause(3000);
 
 			Msgint(fl_er);
 
 
 	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
-			Pause(500);
+			Pause(300);
 			Solenoid(SOL1_ALIGN,0,"m2");
-			Pause(500);
+			Pause(300);
 			Solenoid(SOL1_ALIGN,1,"m2");
 
-			Pause(1000);
+			Pause(300);
 
 	m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
 
-			Pause(1000);
+			Pause(300);
 
 	m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
 
 
-			Pause(500);
+			Pause(300);
 									//проезжает N шагов от начала и останавливается перед штампом
 	m5:		RunStepMotor(7500,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
-			Pause(500);
+			Pause(300);
 
 			Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
 
@@ -144,6 +144,8 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	////////////////////////*отрезка*///////////////////////////////
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
+
+			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
 
 	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout,"m70");
 			Pause(500);
@@ -186,8 +188,30 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 /*Программа печати фото без магнита*/
 void PrintFoto(void){
-	WaitForOptoStatus(0,0,4000,"m1"); 		// Оптрон наличия бумаги
+	WaitForOptoStatus(opto_print_in,1,100,"m1"); 		// Оптрон наличия бумаги
+	Pause(3000);
+
+	Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
+	Pause(500);
+	Solenoid(SOL1_ALIGN,0,"m2");
+	Pause(500);
+	Solenoid(SOL1_ALIGN,1,"m2");
+
+	Pause(500);
+
+	Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
+
+	Pause(500);
+
+	Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
+
+	Solenoid(SOL3_GLUE,1,"m9");
+
 	RunStepMotor(30000,120,1, -2, 1 ,100, "m5");
+
+	Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ
+
+	Solenoid(SOL3_GLUE,0,"m9");
 }
 
 
@@ -659,8 +683,8 @@ void Service(void){
 	PortRead(&hi2c1, adr_pult,&input_pult);
 
 	if(bitRead(input_pult, stp_fr) == 0){		//ШД вперёд
-		TIM1->ARR = 2000;
-		TIM1->CCR1 = 1000;
+		TIM1->ARR = 1000;
+		TIM1->CCR1 = 500;
 		HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);
 		HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);
 	}
@@ -669,8 +693,8 @@ void Service(void){
 			HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_RESET);
 	}
 	else if(bitRead(input_pult, stp_bk) == 0){		//ШД назад
-			TIM1->ARR = 2000;
-			TIM1->CCR1 = 1000;
+			TIM1->ARR = 1000;
+			TIM1->CCR1 = 500;
 			HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET);
 			HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);
 	}

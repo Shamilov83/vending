@@ -125,7 +125,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(300);
 									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(7500,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	m5:		RunStepMotor(7450,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
 
 			Pause(300);
 
@@ -167,14 +167,28 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Msgint(fl_er);
 	//////////////////штамповка///////////////////////////////////////
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , timeout,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 1000, 20000,  500, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
+
+
+
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , timeout,"m0");
+			RunMotor(MOT_SHTAMP, 1000, -1000,  900, -kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
+			//шатмп вверх(закр)
+			RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			Pause(500);
+
+
+
+			//штамп вниз(откр)
+			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
+			Pause(500);
+
+
 	//////////////////////////////////////////////////////////////////
 			//выход из штампа
 			Pause(500);
@@ -791,6 +805,7 @@ void Service(void){
 
 //инициализация выводов устройств
 void InitDev(void){
+
 	//соленойды
 	HAL_GPIO_WritePin(SOL1_ALIGN,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);

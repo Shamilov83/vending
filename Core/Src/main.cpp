@@ -172,6 +172,7 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   InitDev();
+
   HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); 	//генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
   HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);		//запуск режима захвата канала
@@ -189,7 +190,7 @@ int main(void)
 
     HAL_Delay(3000);
     Msg("Srart programm");
-
+    RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60,"m0");
   /* USER CODE END 2 */
 
   /* Infinite loop */

@@ -811,6 +811,7 @@ void InitDev(void){
 	HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(SOL5_PWM,GPIO_PIN_SET);
 	//моторы
 	HAL_GPIO_WritePin(DRAW_KD1_A,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(DRAW_KD1_B,GPIO_PIN_SET);
@@ -825,9 +826,12 @@ void InitDev(void){
 	HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);
 
 	//сброс шины USB
-	HAL_GPIO_WritePin(RES_USB,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(Res_USB,GPIO_PIN_RESET);
 	HAL_Delay(1000);
-	HAL_GPIO_WritePin(RES_USB,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(Res_USB,GPIO_PIN_SET);
+
+	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60,"m0");	//открыть штамп
+	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m7");			//поднять нож
 }
 
 

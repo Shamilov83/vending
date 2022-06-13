@@ -174,7 +174,7 @@ int main(void)
   MX_TIM3_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  InitDev();
+
 
   HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); 	//генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
@@ -193,7 +193,10 @@ int main(void)
 
     HAL_Delay(3000);
     Msg("Srart programm");
-    RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60,"m0");
+
+    InitDev();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -649,7 +652,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 9600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;

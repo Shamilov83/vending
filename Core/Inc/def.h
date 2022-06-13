@@ -88,7 +88,7 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define cut_opn 6
 #define cut_cls 7
 
-#define RES_USB GPIOB,GPIO_PIN_7
+#define Res_USB GPIOC,GPIO_PIN_15
 //шаговый двигатель
 #define EN_STEP_MOT GPIOB,GPIO_PIN_12
 #define DIR_STEP_MOT GPIOB,GPIO_PIN_14
@@ -120,6 +120,8 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define SOL3_GLUE GPIOA,GPIO_PIN_6
 //выдача. сторона А, сторона Б
 #define SOL4_EJECT GPIOA,GPIO_PIN_7
+//включение нагрузки
+#define SOL5_PWM GPIOB,GPIO_PIN_3
 //выход ИК светодиодов
 #define UR_LED GPIOA,GPIO_PIN_3
 //вход татчика тока штампа
@@ -129,13 +131,13 @@ extern uint8_t fl_accel;		//флаг ускорения
 //шина I2C
 #define I2C_CLK GPIOB,GPIO_PIN_8
 #define I2C_DA GPIOB,GPIO_PIN_9
-//вход.концевые выключатели ножа
+//вход
 #define Srv_mod GPIOB,GPIO_PIN_5
-#define KV1_2 GPIOB,GPIO_PIN_6
+#define KV1_2 GPIOC,GPIO_PIN_14
 //вход
 #define KV2_1 GPIOC,GPIO_PIN_13
 #define KV2_2 GPIOA,GPIO_PIN_15
-//оптопары
+//оптодатчики
 #define opto_print_in 0
 #define opto_print_2 1
 #define opto_magn 2

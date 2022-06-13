@@ -76,17 +76,17 @@ extern uint8_t fl_accel;		//флаг ускорения
 
 /*кнопки пульта*/
 //ШД
-#define stp_fr 1
-#define stp_bk 2
+#define stp_fr 0
+#define stp_bk 1
 //Штамп
-#define sht_opn 3
-#define sht_cls 4
+#define sht_opn 2
+#define sht_cls 3
 //Магн
-#define mg_fr 5
-#define mg_bk 6
+#define mg_fr 4
+#define mg_bk 5
 //Нож
-#define cut_opn 7
-#define cut_cls 8
+#define cut_opn 6
+#define cut_cls 7
 
 #define RES_USB GPIOB,GPIO_PIN_7
 //шаговый двигатель

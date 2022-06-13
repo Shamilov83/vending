@@ -29,6 +29,9 @@
 //#include <string>
 /* USER CODE END Includes */
 
+/* External functions --------------------------------------------------------*/
+void SystemClock_Config(void);
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -324,7 +327,7 @@ void TIM1_CC_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-	//прерывание ШИМ ИК-светодиодов.
+	//прерывание Ш�?М �?К-светодиодов.
 	//счетчик импульсов мотор-редуктора
 
 
@@ -410,6 +413,26 @@ void I2C1_ER_IRQHandler(void)
   /* USER CODE BEGIN I2C1_ER_IRQn 1 */
 
   /* USER CODE END I2C1_ER_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USB wake-up interrupt through EXTI line 18.
+  */
+void USBWakeUp_IRQHandler(void)
+{
+  /* USER CODE BEGIN USBWakeUp_IRQn 0 */
+
+  /* USER CODE END USBWakeUp_IRQn 0 */
+  if ((&hpcd_USB_FS)->Init.low_power_enable) {
+    /* Reset SLEEPDEEP bit of Cortex System Control Register */
+    SCB->SCR &= (uint32_t)~((uint32_t)(SCB_SCR_SLEEPDEEP_Msk | SCB_SCR_SLEEPONEXIT_Msk));
+    SystemClock_Config();
+  }
+  /* Clear EXTI pending bit */
+  __HAL_USB_WAKEUP_EXTI_CLEAR_FLAG();
+  /* USER CODE BEGIN USBWakeUp_IRQn 1 */
+
+  /* USER CODE END USBWakeUp_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

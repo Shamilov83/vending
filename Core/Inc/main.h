@@ -64,6 +64,8 @@ void Error_Handler(void);
 #define pin_kv21_GPIO_Port GPIOC
 #define pin_kv12_Pin GPIO_PIN_14
 #define pin_kv12_GPIO_Port GPIOC
+#define Res_USB_Pin GPIO_PIN_15
+#define Res_USB_GPIO_Port GPIOC
 #define ADC_volt_Pin GPIO_PIN_0
 #define ADC_volt_GPIO_Port GPIOA
 #define pin_CS_Pin GPIO_PIN_1
@@ -104,6 +106,8 @@ void Error_Handler(void);
 #define pin_dv12_GPIO_Port GPIOA
 #define pin_kv22_Pin GPIO_PIN_15
 #define pin_kv22_GPIO_Port GPIOA
+#define pin_sol5_Pin GPIO_PIN_3
+#define pin_sol5_GPIO_Port GPIOB
 #define PWM_KD_Pin GPIO_PIN_4
 #define PWM_KD_GPIO_Port GPIOB
 #define pin_kv11_Pin GPIO_PIN_5

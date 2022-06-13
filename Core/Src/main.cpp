@@ -76,6 +76,8 @@ TIM_HandleTypeDef htim4;
 DMA_HandleTypeDef hdma_tim1_ch1;
 DMA_HandleTypeDef hdma_tim4_up;
 
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -90,6 +92,7 @@ static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -170,13 +173,14 @@ int main(void)
   MX_TIM4_Init();
   MX_USB_DEVICE_Init();
   MX_TIM3_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   InitDev();
 
   HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); 	//генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
   HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);		//запуск режима захвата канала
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//запуск ШИМ ШД
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//запуск Ш�?М ШД
   HAL_TIM_Base_Start_IT(&htim4);					//запуск таймера 4 100мс
 
     //работа с инжекторными каналами
@@ -476,7 +480,6 @@ static void MX_TIM2_Init(void)
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 1263;
-  //htim2.Init.Period = 1500;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -511,7 +514,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 100;
+  sConfigOC.Pulse = 600;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
@@ -607,7 +610,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 4800;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 1000;
+  htim4.Init.Period = 100;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -628,6 +631,39 @@ static void MX_TIM4_Init(void)
   /* USER CODE BEGIN TIM4_Init 2 */
 
   /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
 
 }
 
@@ -666,18 +702,28 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(Res_USB_GPIO_Port, Res_USB_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, pin_sol1_Pin|pin_sol2_Pin|pin_sol3_Pin|pin_sol4_Pin
                           |pin_dv21_Pin|pin_dv11_Pin|pin_dv12_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, pin_dv41_Pin|pin_dv42_Pin|pin_dv31_Pin|pin_dv32_Pin
-                          |pin_shag_en_Pin|pin_shag_dir_Pin|pin_dv22_Pin, GPIO_PIN_RESET);
+                          |pin_shag_en_Pin|pin_shag_dir_Pin|pin_dv22_Pin|pin_sol5_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : pin_kv21_Pin pin_kv12_Pin */
   GPIO_InitStruct.Pin = pin_kv21_Pin|pin_kv12_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : Res_USB_Pin */
+  GPIO_InitStruct.Pin = Res_USB_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(Res_USB_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : pin_sol1_Pin pin_sol2_Pin pin_sol3_Pin pin_sol4_Pin
                            pin_dv21_Pin pin_dv11_Pin pin_dv12_Pin */
@@ -689,9 +735,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : pin_dv41_Pin pin_dv42_Pin pin_dv31_Pin pin_dv32_Pin
-                           pin_shag_en_Pin pin_shag_dir_Pin pin_dv22_Pin */
+                           pin_shag_en_Pin pin_shag_dir_Pin pin_dv22_Pin pin_sol5_Pin */
   GPIO_InitStruct.Pin = pin_dv41_Pin|pin_dv42_Pin|pin_dv31_Pin|pin_dv32_Pin
-                          |pin_shag_en_Pin|pin_shag_dir_Pin|pin_dv22_Pin;
+                          |pin_shag_en_Pin|pin_shag_dir_Pin|pin_dv22_Pin|pin_sol5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -708,12 +754,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(pin_kv11_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : pin_enc_Pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 

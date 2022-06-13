@@ -119,7 +119,6 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
     	//Write_I2C(&hi2c1, adr_EEPROM, 0x10, (unsigned char*)mtk,8);			//записать шаг в EEPROM
     	fl_er = 1;	//выставить флаг ошибки
     }
-    //else fl_er = 0;
  }
 
 
@@ -180,7 +179,7 @@ int main(void)
   HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); 	//генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
   HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);		//запуск режима захвата канала
-  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//запуск Ш�?М ШД
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//запуск Ш�?М ШД
   HAL_TIM_Base_Start_IT(&htim4);					//запуск таймера 4 100мс
 
     //работа с инжекторными каналами

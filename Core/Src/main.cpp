@@ -206,7 +206,7 @@ int main(void)
 	  if(HAL_GPIO_ReadPin(Srv_mod) == 1){
 
 
-		  	  if(!fl_run_prg) {	//если программа не выполняется и нет флаго ошибки
+		  	  if(!fl_run_prg) {				//если программа не выполняется и нет флага ошибки
 
 		  		  if(fl_rx == 1){			//проверить есть ли данные для приема
 		  			  fl_run_prg = 1; 		//флаг выполнения программы
@@ -218,7 +218,6 @@ int main(void)
 	  else{
 
 		  Service();
-		 //Main_func(10000,1,60);
 
 /*
 		  PortRead(&hi2c1, adr_ur_sens,&input_UR);
@@ -228,12 +227,6 @@ int main(void)
 	  }
 
 HAL_Delay(5);
-
-
-	  /*
-	  Msgint(cod_ADC_CS);
-	  Pause(500);
-	  */
 
     /* USER CODE END WHILE */
 

@@ -28,14 +28,14 @@ typedef enum
 } StatusMotor;
 
 //флаги
-extern uint8_t fl_er;		//флаг выхода из программы с ошибкой
-extern uint8_t flag_stop;	//флаг остановки двигателя
-extern uint8_t err_tm;		//флаг ошибки по таймауту
-extern uint8_t fl_rx;		//флаг принятой команды
+extern uint8_t fl_er;			//флаг выхода из программы с ошибкой
+extern uint8_t flag_stop;		//флаг остановки двигателя
+extern uint8_t err_tm;			//флаг ошибки по таймауту
+extern uint8_t fl_rx;			//флаг принятой команды
 
-extern char mtk[8];			// метка программы
-extern uint8_t input_UR;	//неактивное состояние датчиков "1" (подтяжка к питанию)
-extern uint8_t input_pult;	//и кнопок
+extern char mtk[8];				// метка программы
+extern uint8_t input_UR;		//неактивное состояние датчиков "1" (подтяжка к питанию)
+extern uint8_t input_pult;		//и кнопок
 //extern uint8_t bt = 100;
 //extern string usb_buf_rx;
 extern char usb_buf_tx[21];		//буфер для передачи
@@ -44,13 +44,13 @@ extern uint16_t param[5];		//буфер с параметрами команды
 //#define otl 1
 extern uint8_t adr_ur_sens;		//адрес расширителя портов для фотодатчиков
 extern uint8_t adr_pult;		//адрес расширителя портов для пульта
-extern uint8_t adr_EEPROM;	//адрес EEPROM
+extern uint8_t adr_EEPROM;		//адрес EEPROM
 
 extern uint8_t fl_run_prg;		//флаг выполнения программы
 extern uint16_t count_mg;		//счетчик магнита
 extern uint8_t coun_prg;		//счетчик выпонения программы
 extern int count_step;			//счетчик шагов ШД
-extern long count_taho;		//счетчик тахогенератора
+extern long count_taho;			//счетчик тахогенератора
 extern uint32_t count_100ms;	//счетчик 100мс
 extern uint16_t cod_ADC_PW;		//контроль питания МК
 extern uint16_t cod_ADC_CS;		//датчик тока

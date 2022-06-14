@@ -52,7 +52,7 @@ uint8_t fl_rx;				//принята команда
 
 bool fl_run_pr = 0;			//флаг выпонения программы. выставляется после запуска
 uint8_t err_tm;
-uint8_t fl_run_prg;		//флаг вып прг
+uint8_t fl_run_prg;			//флаг вып прг
 
 char mtk[8];					//
 //char usb_buf_rx[21];
@@ -524,11 +524,11 @@ void PortRead(I2C_HandleTypeDef *hi2c, uint8_t DevAddress, uint8_t *port)
 //Разбор принятых данных
 string convertCommandToIntList(string &str,uint16_t *array ) {
 	int8_t i;
-	if(str.find(',') != string::npos){	//если команда с параметрами
+	if(str.find(',') != string::npos){					//если команда с параметрами
 	size_t index = str.find('(');
 	//Msg(" --parsing--  ");
 	//HAL_Delay(5);
-	string command = str.substr(0, index);	//возвращает подстроку от нулевого элемента до "("
+	string command = str.substr(0, index);				//возвращает подстроку от нулевого элемента до "("
 	//Msg(command);
 	str = str.substr((index + 1), str.find(')'));		//возвращает подстроку с параметрами команды не включая скобки
 	//Msg(str);
@@ -536,15 +536,15 @@ string convertCommandToIntList(string &str,uint16_t *array ) {
 	for (int8_t j = 0; j<=2; j++ ) {
 		i  = str.find(',');
 		if(str.find(',') == string::npos) i = (str.length()-1);
-		string arg = str.substr(0, i);	//возвращает первый элемент параметра команды
+		string arg = str.substr(0, i);					//возвращает первый элемент параметра команды
 		//Msg("arg ="+arg);
 		//HAL_Delay(5);
-		array[j] = (stoi(arg));			//добавить преобразованный, из строки в инт, элемент связанного списка
+		array[j] = (stoi(arg));							//добавить преобразованный, из строки в инт, элемент связанного списка
 		//Msgint(param[j]);
-		str = str.substr(i+1);			//возвращает подстроку с указ позиции и до конца строки
+		str = str.substr(i+1);							//возвращает подстроку с указ позиции и до конца строки
 		//Msg("str="+str);
 		HAL_Delay(5);
-	}									//выход из цикла произойдет не добавив последний параметр в связанный список
+	}													//выход из цикла произойдет не добавив последний параметр в связанный список
 	return command+="()" ;
 	}
 	else{
@@ -557,10 +557,10 @@ void executeCommand(string data_rx)
 	//Msg("--Build arrea--");
 	string command = convertCommandToIntList(data_rx, param);
 	//Msg("executeCommand...\r\n");
-	if (command.find("Reboot()") != string::npos) { //если строка найдена. string::npos(-1) возвращается если заданная строка не найдена.
+	if (command.find("Reboot()") != string::npos) { 	//если строка найдена. string::npos(-1) возвращается если заданная строка не найдена.
 		Msg("Reboot devace...\r\n");
-		   __set_FAULTMASK(1);// Запрещаем все маскируемые прерывания //связь виснет нужен ресет шины
-		   NVIC_SystemReset();// Программный сброс
+		   __set_FAULTMASK(1);							// Запрещаем все маскируемые прерывания //связь виснет нужен ресет шины
+		   NVIC_SystemReset();							// Программный сброс
 		   usb_buf_rx.clear();
 	}
 	else if (command.find("Connect()") != string::npos) {
@@ -568,21 +568,42 @@ void executeCommand(string data_rx)
 	}
 	else if (command.find("RunPrg()") != string::npos) {
 			Msg("RunPrgramm...\r\n");
-			Main_func (param[0],param[1],param[2]);//запуск основной программы
+			Main_func (param[0],param[1],param[2]);		//запуск основной программы
 	}
 	else if(command.find("ResetError()")!= string::npos){
 			Msg("ResetError...\r\n");
-			fl_er = 0;	//сброс флага ошибки
+			fl_er = 0;									//сброс флага ошибки
 	}
 	else if(command.find("PrintFoto()")!= string::npos){
-			PrintFoto();	//печать фото
+			PrintFoto();								//печать фото
 	}
 	else if(command.find("MagnFrv()")!= string::npos){
-			MagnFrv();		//подача магнита
+			MagnFrv();									//подача магнита
 	}
 	else if(command.find("Test()")!= string::npos){
 				TestDev();		//
-		}
+	}
+	else if(command.find("ShtampOpen()")!= string::npos){
+
+	}
+	else if(command.find("CutUp()")!= string::npos){
+
+	}
+	else if(command.find("MagnFrv()")!= string::npos){
+
+	}
+	else if(command.find("StepFrv()")!= string::npos){
+
+	}
+	else if(command.find("StepBack()")!= string::npos){
+
+	}
+
+
+
+
+
+
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
 }
@@ -592,7 +613,7 @@ void executeCommand(string data_rx)
 //функция формирования строковой переменной
 void ArreyRx(string data_rx){
 
-	if( data_rx.find(')') != string::npos){	//если найден символ окончания команды
+	if( data_rx.find(')') != string::npos){					//если найден символ окончания команды
 		usb_buf_rx += data_rx;
 		//Msg(usb_buf_rx);
 		fl_rx = 1;

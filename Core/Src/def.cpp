@@ -195,7 +195,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 				//старт ШД на N шагов
 	m18:	RunStepMotor(20000,120,1, -1, 0 ,timeout, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
-
+	m100:;
 
 }
 
@@ -578,30 +578,20 @@ void executeCommand(string data_rx)
 			PrintFoto();								//печать фото
 	}
 	else if(command.find("MagnFrv()")!= string::npos){
-			MagnFrv();									//подача магнита
+		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60,"m100");	//подача магнита
 	}
 	else if(command.find("Test()")!= string::npos){
 				TestDev();		//
 	}
 	else if(command.find("ShtampOpen()")!= string::npos){
-
+		RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , 20,"m100");
 	}
 	else if(command.find("CutUp()")!= string::npos){
-
+		RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20,"m100");
 	}
-	else if(command.find("MagnFrv()")!= string::npos){
-
+	else if(command.find("RunStepMot()")!= string::npos){
+		RunStepMotor(param[0],120,1, -1, 0 ,20, "m100");  //команда запуска ШД на N шагов RunStepMot(N |-N)
 	}
-	else if(command.find("StepFrv()")!= string::npos){
-
-	}
-	else if(command.find("StepBack()")!= string::npos){
-
-	}
-
-
-
-
 
 
 	usb_buf_rx.clear();	//очистить переменную

@@ -66,7 +66,7 @@ uint8_t coun_prg = 0;		//счетчик выпонения программы
 int count_step;				//счетчик шагов ШД
 long count_taho = 0;		//счетчик тахогенератора
 uint32_t count_100ms = 0;	//счетчик 100мс
-int step;					//количество шагов
+int step;					//абсолютное количество шагов
 //int t;
 
 uint16_t cod_ADC_PW;		//код АЦП напр. пит
@@ -105,6 +105,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(3000);
 
+			Msg("fl_er = ");
 			Msgint(fl_er);
 
 
@@ -152,6 +153,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
 
+			Msg("fl_er = ");
 			Msgint(fl_er);
 	////////////////////////////////////////////////////////////////
 
@@ -165,7 +167,9 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
 			Pause(500);
 
+			Msg("fl_er = ");
 			Msgint(fl_er);
+
 	//////////////////штамповка///////////////////////////////////////
 			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
@@ -346,39 +350,35 @@ return MOT_ERROR;
 	for(;;){
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		if(bitRead(input_UR, opto_print_in) == 0){
-		count_step = 0;
+		//count_step = 0;
 		break;
 		}
 		else if(count_100ms > 1000 ){
 			Msg("MT_TMT1_SM");
 			//fl_er = 1;
-			break;
-			//return MOT_TIMEOUT;
+			//break;
+			return MOT_TIMEOUT;
 		}
 	}
 
 Msg("count_step = 0");
 
+	count_step = 0;
 	for(;;){
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
 
 		if(num_opt >= 0 ){								//если оспользуется оптодатчик
 			PortRead(&hi2c1, adr_ur_sens,&input_UR);
 			if(bitRead(input_UR, num_opt) == status){
-				//if(fl_deb == status){
-				Msgint(count_step);
+
 				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
+				Msgint(count_step);
 				return MOT_OK;
 			}
 		}
-
-
-		//if((count_step >= step) or (fl_deb == status)){
 			if(count_step >= step){
-			Msg("count_step >= step");
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
-			//TIM1->ARR = 0;
-			//TIM1->CCR1 = 0;
+			Msg("count_step >= step");
 			return MOT_OK;
 		}
 			else if(count_100ms > timeout ){				//если превышен таймаут

@@ -14,9 +14,9 @@ stm32f1xx_it.cpp:264:6:void USB_HP_CAN1_TX_IRQHandler()	8	static
 stm32f1xx_it.cpp:278:6:void USB_LP_CAN1_RX0_IRQHandler()	8	static
 stm32f1xx_it.cpp:292:6:void TIM1_UP_IRQHandler()	8	static
 stm32f1xx_it.cpp:306:6:void TIM1_CC_IRQHandler()	8	static
-stm32f1xx_it.cpp:327:6:void TIM2_IRQHandler()	8	static
-stm32f1xx_it.cpp:344:6:void TIM3_IRQHandler()	8	static
-stm32f1xx_it.cpp:358:6:void TIM4_IRQHandler()	8	static
-stm32f1xx_it.cpp:394:6:void I2C1_EV_IRQHandler()	8	static
-stm32f1xx_it.cpp:408:6:void I2C1_ER_IRQHandler()	8	static
-stm32f1xx_it.cpp:421:6:void USBWakeUp_IRQHandler()	8	static
+stm32f1xx_it.cpp:329:6:void TIM2_IRQHandler()	8	static
+stm32f1xx_it.cpp:346:6:void TIM3_IRQHandler()	8	static
+stm32f1xx_it.cpp:360:6:void TIM4_IRQHandler()	8	static
+stm32f1xx_it.cpp:397:6:void I2C1_EV_IRQHandler()	8	static
+stm32f1xx_it.cpp:411:6:void I2C1_ER_IRQHandler()	8	static
+stm32f1xx_it.cpp:424:6:void USBWakeUp_IRQHandler()	8	static

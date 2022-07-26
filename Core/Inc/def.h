@@ -94,13 +94,13 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define DIR_STEP_MOT GPIOB,GPIO_PIN_14
 #define STEP_STEP_MOT GPIOB,GPIO_PIN_13
 //двигатель штампа
-#define DRAW_KD1_A GPIOA,GPIO_PIN_10
-#define DRAW_KD1_B GPIOA,GPIO_PIN_9
+#define DRAW_KD1_A GPIOA,GPIO_PIN_9
+#define DRAW_KD1_B GPIOA,GPIO_PIN_10
 #define MOT_SHTAMP  DRAW_KD1_A,DRAW_KD1_B
 
 //двигатель выброса. сторона А, сторона Б
 #define DRAW_KD2_A GPIOA,GPIO_PIN_8
-#define DRAW_KD2_B GPIOA,GPIO_PIN_15
+#define DRAW_KD2_B GPIOB,GPIO_PIN_15
 #define MOT_EJECT DRAW_KD2_A,DRAW_KD2_B
 
 //двигатель ножа1

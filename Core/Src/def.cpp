@@ -323,31 +323,43 @@ StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt,
 if(fl_er){
 return MOT_ERROR;
 }
+	uint8_t pulse = 5;
 	Msg("Start Step mot");
 	WriteMtk(mt);
 	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
 	else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
 
-	pediod_T1 = ((F_cnt*10)/(speed*200)) ;
+//	pediod_T1 = ((F_cnt*10)/(speed*200)) ;
 
 	count_100ms = 0;
 	count_step = 0;
-
+/*
 	pulse_T1 = pediod_T1/8;
 	accel_st = accel;
-
+*/
 	timeout = (timeout*10);//Cек
+
 
 	step = abs(steps);
 	//старт ШД
+/*
 	TIM1->ARR = pediod_T1;
 	TIM1->CCR1 = pulse_T1;
+*/
 	HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
 
 /*
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
 	for(;;){
+		//Строб ШД.
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		Pause(pulse);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		Pause(pulse);
+/////////////////////////////////////////////////////////////////
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		if(bitRead(input_UR, opto_print_in) == 0){
 		//count_step = 0;
@@ -359,12 +371,23 @@ return MOT_ERROR;
 			//break;
 			return MOT_TIMEOUT;
 		}
+
 	}
 
 Msg("count_step = 0");
 
 	count_step = 0;
 	for(;;){
+
+		//Строб ШД
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		Pause(pulse);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		Pause(pulse);
+/////////////////////////////////////////////////////////////////
+
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
 
 		if(num_opt >= 0 ){								//если оспользуется оптодатчик

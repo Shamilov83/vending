@@ -338,6 +338,7 @@ return MOT_ERROR;
 
 	timeout = (timeout*10);//Cек
 
+
 	step = abs(steps);
 	//старт ШД
 	TIM1->ARR = pediod_T1;

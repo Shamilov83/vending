@@ -352,7 +352,7 @@ return MOT_ERROR;
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
 	for(;;){
-		//Строб ШД
+		//Строб ШД.
 ////////////////////////////////////////////////////////////////
 		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
 		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);

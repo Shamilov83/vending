@@ -1436,11 +1436,11 @@ Disassembly of section .text:
  8000e9a:	4628      	mov	r0, r5
  8000e9c:	f002 f823 	bl	8002ee6 <HAL_GPIO_WritePin>
  8000ea0:	2201      	movs	r2, #1
- 8000ea2:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 8000ea2:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000ea6:	4620      	mov	r0, r4
  8000ea8:	f002 f81d 	bl	8002ee6 <HAL_GPIO_WritePin>
  8000eac:	2201      	movs	r2, #1
- 8000eae:	f44f 7100 	mov.w	r1, #512	; 0x200
+ 8000eae:	f44f 6180 	mov.w	r1, #1024	; 0x400
  8000eb2:	4620      	mov	r0, r4
  8000eb4:	f002 f817 	bl	8002ee6 <HAL_GPIO_WritePin>
  8000eb8:	2201      	movs	r2, #1
@@ -1449,7 +1449,7 @@ Disassembly of section .text:
  8000ec0:	f002 f811 	bl	8002ee6 <HAL_GPIO_WritePin>
  8000ec4:	2201      	movs	r2, #1
  8000ec6:	f44f 4100 	mov.w	r1, #32768	; 0x8000
- 8000eca:	4620      	mov	r0, r4
+ 8000eca:	4628      	mov	r0, r5
  8000ecc:	f002 f80b 	bl	8002ee6 <HAL_GPIO_WritePin>
  8000ed0:	2201      	movs	r2, #1
  8000ed2:	f44f 6180 	mov.w	r1, #1024	; 0x400
@@ -1492,9 +1492,9 @@ Disassembly of section .text:
  8000f3e:	9301      	str	r3, [sp, #4]
  8000f40:	f44f 767a 	mov.w	r6, #1000	; 0x3e8
  8000f44:	9600      	str	r6, [sp, #0]
- 8000f46:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 8000f46:	f44f 6380 	mov.w	r3, #1024	; 0x400
  8000f4a:	4622      	mov	r2, r4
- 8000f4c:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 8000f4c:	f44f 7100 	mov.w	r1, #512	; 0x200
  8000f50:	4620      	mov	r0, r4
  8000f52:	f7ff fe67 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  8000f56:	4b11      	ldr	r3, [pc, #68]	; (8000f9c <_Z7InitDevv+0x138>)
@@ -1762,9 +1762,9 @@ Disassembly of section .text:
  8001238:	9301      	str	r3, [sp, #4]
  800123a:	f44f 777a 	mov.w	r7, #1000	; 0x3e8
  800123e:	9700      	str	r7, [sp, #0]
- 8001240:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 8001240:	f44f 6380 	mov.w	r3, #1024	; 0x400
  8001244:	462a      	mov	r2, r5
- 8001246:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 8001246:	f44f 7100 	mov.w	r1, #512	; 0x200
  800124a:	4628      	mov	r0, r5
  800124c:	f7ff fcea 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  8001250:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -1779,9 +1779,9 @@ Disassembly of section .text:
  8001270:	f644 6920 	movw	r9, #20000	; 0x4e20
  8001274:	f8cd 9004 	str.w	r9, [sp, #4]
  8001278:	9700      	str	r7, [sp, #0]
- 800127a:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 800127a:	f44f 6380 	mov.w	r3, #1024	; 0x400
  800127e:	462a      	mov	r2, r5
- 8001280:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 8001280:	f44f 7100 	mov.w	r1, #512	; 0x200
  8001284:	4628      	mov	r0, r5
  8001286:	f7ff fccd 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  800128a:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -1795,9 +1795,9 @@ Disassembly of section .text:
  80012a4:	f5a3 7379 	sub.w	r3, r3, #996	; 0x3e4
  80012a8:	9301      	str	r3, [sp, #4]
  80012aa:	9700      	str	r7, [sp, #0]
- 80012ac:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 80012ac:	f44f 6380 	mov.w	r3, #1024	; 0x400
  80012b0:	462a      	mov	r2, r5
- 80012b2:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 80012b2:	f44f 7100 	mov.w	r1, #512	; 0x200
  80012b6:	4628      	mov	r0, r5
  80012b8:	f7ff fcb4 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  80012bc:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -1809,9 +1809,9 @@ Disassembly of section .text:
  80012d0:	f8cd b008 	str.w	fp, [sp, #8]
  80012d4:	f8cd 9004 	str.w	r9, [sp, #4]
  80012d8:	9700      	str	r7, [sp, #0]
- 80012da:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 80012da:	f44f 6380 	mov.w	r3, #1024	; 0x400
  80012de:	462a      	mov	r2, r5
- 80012e0:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 80012e0:	f44f 7100 	mov.w	r1, #512	; 0x200
  80012e4:	4628      	mov	r0, r5
  80012e6:	f7ff fc9d 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  80012ea:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -1843,9 +1843,9 @@ Disassembly of section .text:
  8001346:	4b10      	ldr	r3, [pc, #64]	; (8001388 <_Z9Main_functhh+0x3e4>)
  8001348:	9301      	str	r3, [sp, #4]
  800134a:	9700      	str	r7, [sp, #0]
- 800134c:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 800134c:	f44f 6380 	mov.w	r3, #1024	; 0x400
  8001350:	462a      	mov	r2, r5
- 8001352:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 8001352:	f44f 7100 	mov.w	r1, #512	; 0x200
  8001356:	4628      	mov	r0, r5
  8001358:	f7ff fc64 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  800135c:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
@@ -2053,9 +2053,9 @@ Disassembly of section .text:
  800155c:	9301      	str	r3, [sp, #4]
  800155e:	f44f 737a 	mov.w	r3, #1000	; 0x3e8
  8001562:	9300      	str	r3, [sp, #0]
- 8001564:	f44f 7300 	mov.w	r3, #512	; 0x200
+ 8001564:	f44f 6380 	mov.w	r3, #1024	; 0x400
  8001568:	4602      	mov	r2, r0
- 800156a:	f44f 6180 	mov.w	r1, #1024	; 0x400
+ 800156a:	f44f 7100 	mov.w	r1, #512	; 0x200
  800156e:	f7ff fb59 	bl	8000c24 <_Z8RunMotorP12GPIO_TypeDeftS0_ttlsahtPKc>
  8001572:	e738      	b.n	80013e6 <_Z14executeCommandNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE+0x56>
  8001574:	2307      	movs	r3, #7

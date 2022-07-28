@@ -283,7 +283,6 @@ status:
 1 - 01;
 2 - 10;
 3 - 11.
-
 */
 
 /*функция включения соленойда
@@ -323,31 +322,43 @@ StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt,
 if(fl_er){
 return MOT_ERROR;
 }
+	uint8_t pulse = 5;
 	Msg("Start Step mot");
 	WriteMtk(mt);
 	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
 	else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
 
-	pediod_T1 = ((F_cnt*10)/(speed*200)) ;
+//	pediod_T1 = ((F_cnt*10)/(speed*200)) ;
 
 	count_100ms = 0;
 	count_step = 0;
-
+/*
 	pulse_T1 = pediod_T1/8;
 	accel_st = accel;
-
+*/
 	timeout = (timeout*10);//Cек
+
 
 	step = abs(steps);
 	//старт ШД
+/*
 	TIM1->ARR = pediod_T1;
 	TIM1->CCR1 = pulse_T1;
+*/
 	HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
 
 /*
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
 	for(;;){
+		//Строб ШД.
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		Pause(pulse);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		Pause(pulse);
+/////////////////////////////////////////////////////////////////
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		if(bitRead(input_UR, opto_print_in) == 0){
 		//count_step = 0;
@@ -359,12 +370,23 @@ return MOT_ERROR;
 			//break;
 			return MOT_TIMEOUT;
 		}
+
 	}
 
 Msg("count_step = 0");
 
 	count_step = 0;
 	for(;;){
+
+		//Строб ШД
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		Pause(pulse);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		Pause(pulse);
+/////////////////////////////////////////////////////////////////
+
 		PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
 
 		if(num_opt >= 0 ){								//если оспользуется оптодатчик
@@ -626,7 +648,6 @@ void TestDev(void){
 
 /*
 	Pause(3000);
-
 	Solenoid(SOL1_VIR,0); 	//вкл
 	Pause(2000);
 	Solenoid(SOL1_VIR,1);	//выкл
@@ -660,7 +681,6 @@ void TestDev(void){
 	StopMotor(DRAW_KD2_A,DRAW_KD2_B);
 	//Pause(500);
 	//puts("SM");
-
 */
 
 
@@ -679,8 +699,6 @@ void TestDev(void){
 	//шатмп вверх
 	RunMotor(MOT_CUT, 5, -2000,  3000, 3, 0 , 50,"m0");
 	Pause(500);
-
-
 	RunMotor(MOT_MAGN, 1000, 2000,  -4000, opto_magn, 0 , 50,"m0");
 	Pause(500);
 */
@@ -822,7 +840,7 @@ void InitDev(void){
 	HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_SET);
-	HAL_GPIO_WritePin(SOL5_PWM,GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(SOL5_PWM,GPIO_PIN_SET);
 	//моторы
 	HAL_GPIO_WritePin(DRAW_KD1_A,GPIO_PIN_SET);
 	HAL_GPIO_WritePin(DRAW_KD1_B,GPIO_PIN_SET);
@@ -870,6 +888,3 @@ void Msgint(int val){
 	string str = itoa(val,arrey,10);	//itoa(переменная,промеж.массив,сист.счисл.)
 	Msg(str);
 }
-
-
-

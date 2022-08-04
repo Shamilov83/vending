@@ -99,7 +99,7 @@ static void MX_TIM3_Init(void);
 
 extern void initialize_monitor_handles(void);
 
-//опробовать вариант контроля питания по прерыванию, а контроль тока по запуску измерения
+
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
     if(hadc->Instance == ADC1) //check if the interrupt comes from ACD1

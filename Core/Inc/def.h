@@ -88,7 +88,7 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define cut_opn 6
 #define cut_cls 7
 
-#define Res_USB GPIOB,GPIO_PIN_15
+#define Res_USB GPIOB,GPIO_PIN_7
 //шаговый двигатель
 #define EN_STEP_MOT GPIOB,GPIO_PIN_12
 #define DIR_STEP_MOT GPIOB,GPIO_PIN_14

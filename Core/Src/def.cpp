@@ -856,7 +856,7 @@ void InitDev(void){
 
 	//сброс шины USB
 	HAL_GPIO_WritePin(Res_USB,GPIO_PIN_RESET);
-	HAL_Delay(1000);
+	HAL_Delay(500);
 	HAL_GPIO_WritePin(Res_USB,GPIO_PIN_SET);
 
 	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60,"m0");	//открыть штамп

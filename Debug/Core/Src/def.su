@@ -2,28 +2,28 @@ core_cm3.h:1762:34:void __NVIC_SystemReset()	4	static,ignoring_inline_asm
 std_abs.h:56:3:long int std::abs(long int)	16	static
 gthr-default.h:229:1:int __gthread_key_delete(__gthread_key_t)	16	static
 basic_string.h:6503:3:int std::__cxx11::stoi(const string&, std::size_t*, int)	32	static
-def.cpp:96:6:void Main_func(uint16_t, uint8_t, uint8_t)	80	static
-def.cpp:188:6:void PrintFoto()	24	static
-def.cpp:195:6:void MagnFrv()	40	static
-def.cpp:208:6:void WaitForOptoStatus(uint8_t, uint8_t, uint8_t, const char*)	104	static
-def.cpp:251:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t, const char*)	56	static
-def.cpp:280:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t, const char*)	192	static
-def.cpp:377:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t, const char*)	168	static
-def.cpp:462:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
-def.cpp:475:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	40	static
-def.cpp:487:8:std::string convertCommandToIntList(std::string&, uint16_t*)	136	static
-def.cpp:517:6:void executeCommand(std::string)	160	static,ignoring_inline_asm
-def.cpp:552:6:void ArreyRx(std::string)	16	static
-def.cpp:568:6:void TestDev()	40	static
-def.cpp:645:6:void Service()	176	static
-def.cpp:761:6:void InitDev()	8	static
-def.cpp:788:6:void WriteMtk(const char*)	48	static
-def.cpp:794:6:void Msg(std::string)	40	dynamic
-def.cpp:806:6:void Msgint(int)	96	static
+def.cpp:96:6:void Main_func(uint16_t, uint8_t, uint8_t)	160	static
+def.cpp:208:6:void PrintFoto()	24	static
+def.cpp:237:6:void MagnFrv()	40	static
+def.cpp:250:6:void WaitForOptoStatus(uint8_t, uint8_t, uint8_t, const char*)	104	static
+def.cpp:292:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t, const char*)	56	static
+def.cpp:321:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t, const char*)	168	static
+def.cpp:437:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t, const char*)	168	static
+def.cpp:522:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	24	static
+def.cpp:535:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	40	static
+def.cpp:547:8:std::string convertCommandToIntList(std::string&, uint16_t*)	136	static
+def.cpp:577:6:void executeCommand(std::string)	192	static,ignoring_inline_asm
+def.cpp:626:6:void ArreyRx(std::string)	16	static
+def.cpp:642:6:void TestDev()	24	static
+def.cpp:720:6:void Service()	176	static
+def.cpp:836:6:void InitDev()	40	static
+def.cpp:868:6:void WriteMtk(const char*)	48	static
+def.cpp:874:6:void Msg(std::string)	40	dynamic
+def.cpp:886:6:void Msgint(int)	96	static
 string_conversions.h:63:2:)::_Save_errno::_Save_errno() [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	16	static
 string_conversions.h:64:2:)::_Save_errno::~_Save_errno() [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	16	static
 string_conversions.h:73:4:)::_Range_chk::_S_chk(_TRet, std::true_type) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	16	static
 string_conversions.h:54:5:) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	56	static
-def.cpp:810:1:void __static_initialization_and_destruction_0(int, int)	16	static
-def.cpp:810:1:cpp)	8	static
-def.cpp:810:1:cpp)	8	static
+def.cpp:890:1:void __static_initialization_and_destruction_0(int, int)	16	static
+def.cpp:890:1:cpp)	8	static
+def.cpp:890:1:cpp)	8	static

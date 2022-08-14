@@ -1033,3 +1033,45 @@ void delay_micros(uint32_t us)
     DWT->CYCCNT = 0U; 							// обнуляем счётчик
     while(DWT->CYCCNT < us_count_tic);
 }
+
+
+/*
+ * функция работы с EEPROM
+ */
+HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len)
+   {
+       HAL_StatusTypeDef returnValue;
+       uint8_t addr[2];
+       /* вычисляется MSB и LSB части адреса памяти */
+       addr[0] = (uint8_t) ((MemAddress & 0xFF00) >> 8);
+       addr[1] = (uint8_t) (MemAddress & 0xFF);
+       /* Отправить адрес ячейки памяти, с которой начинаем читать данные */
+       returnValue = HAL_I2C_Master_Transmit(hi2c, DevAddress, addr, 2, HAL_MAX_DELAY);
+       if(returnValue != HAL_OK)
+           return returnValue;
+       /* получить данные из EEPROM */
+       returnValue = HAL_I2C_Master_Receive(hi2c, DevAddress, pData, len, HAL_MAX_DELAY);
+       return returnValue;
+   }
+HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len)
+   {
+       HAL_StatusTypeDef returnValue;
+       uint8_t *data;
+       /* Сначала выделяется временный буфер для хранения целевой памяти
+               * адрес и данные для хранения */
+       data = (uint8_t*)malloc(sizeof(uint8_t)*(len+2));
+       /* вычислить MSB и LSB части адреса памяти */
+       data[0] = (uint8_t) ((MemAddress & 0xFF00) >> 8);
+       data[1] = (uint8_t) (MemAddress & 0xFF);
+       /* копировать содержимое массива pData во временный буфер */
+       memcpy(data+2, pData, len);
+       /* готовность передать буфер по шине I2C */
+       returnValue = HAL_I2C_Master_Transmit(hi2c, DevAddress, data, len + 2, HAL_MAX_DELAY);
+       if(returnValue != HAL_OK)
+           return returnValue;
+       free(data);
+       /* Ожидание пока EEPROM сохранит данные в памяти */
+       while(HAL_I2C_Master_Transmit(hi2c, DevAddress, 0, 0, HAL_MAX_DELAY) != HAL_OK);
+       return HAL_OK;
+   }
+

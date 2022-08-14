@@ -16,6 +16,12 @@ extern "C" {
 
 #include "stm32f1xx_hal.h"
 #include <string>
+
+#define DWT_CONTROL *(volatile unsigned long *)0xE0001000
+#define SCB_DEMCR   *(volatile unsigned long *)0xE000EDFC
+
+#define DEBUG 1
+
 extern I2C_HandleTypeDef hi2c1;
 
 //структура возвращаемого значения функций запуска двигателей
@@ -39,7 +45,7 @@ extern uint8_t input_pult;		//и кнопок
 //extern uint8_t bt = 100;
 //extern string usb_buf_rx;
 extern char usb_buf_tx[21];		//буфер для передачи
-extern uint16_t param[5];		//буфер с параметрами команды
+extern int param[5];		//буфер с параметрами команды
 
 //#define otl 1
 extern uint8_t adr_ur_sens;		//адрес расширителя портов для фотодатчиков
@@ -150,6 +156,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout);
 void PrintFoto(void);
 void Service(void);
 void MagnFrv(void);
+void Foto_to_magn(uint16_t,uint8_t,uint8_t);
 void WaitForOptoStatus(uint8_t num,uint8_t status,uint8_t timeout,const char* mt);
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);
 void messege_err(char);
@@ -161,6 +168,8 @@ HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_
 HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len);
 void PortRead(I2C_HandleTypeDef *hi2c, uint8_t DevAddress, uint8_t *port);
 void WriteMtk(const char* mt);
+void DWT_Init(void);
+void delay_micros(uint32_t us);
 //void executeCommand(string data);
 void TestDev(void);
 void InitDev(void);

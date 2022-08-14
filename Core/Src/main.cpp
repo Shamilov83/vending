@@ -40,9 +40,7 @@
 //#include <stdio.h>
 #include <cstring>
 #include "def.h"
-
 #include "usbd_cdc_if.h"
-
 
 using namespace std;
 //#include "i2c_er.h"
@@ -168,7 +166,7 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  DWT_Init();
 
   //HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); 	//генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
@@ -185,8 +183,8 @@ int main(void)
 
     PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
 
-    HAL_Delay(3000);
-    Msg("Srart programm");
+    HAL_Delay(1000);
+    Msg("Start program");
 
     InitDev();
 
@@ -197,10 +195,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(HAL_GPIO_ReadPin(Srv_mod) == 1){
 
-
-		  	  if(!fl_run_prg) {				//если программа не выполняется и нет флага ошибки
+	  	  	  if(!fl_run_prg) {				//если программа не выполняется и нет флага ошибки
 
 		  		  if(fl_rx == 1){			//проверить есть ли данные для приема
 		  			  fl_run_prg = 1; 		//флаг выполнения программы
@@ -208,17 +204,17 @@ int main(void)
 		  			  fl_run_prg = 0; 		//флаг выполнения программы
 		  		  }
 		  	  }
-	  }
-	  else{
-
-		  Service();
+	  	  	  else{
+	  	  		Msg("Program execution");
+	  	  	  }
 
 /*
 		  PortRead(&hi2c1, adr_ur_sens,&input_UR);
 		  if(bitRead(input_UR, opto_print_in) == 0) Msg("foto on");
 		  Pause(500);
 */
-	  }
+
+
 
 HAL_Delay(5);
 

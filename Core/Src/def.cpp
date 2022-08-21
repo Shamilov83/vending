@@ -6,11 +6,11 @@
  *
  *   биты input_UR
  *   0 - оптодатчик наличия фото
- *   1 - оптодатчик магнита
- *   2 - оптодатчик бумаги
- *   3 - оптодатчик
- *   4 -
- *   5 -
+ *   1 - оптодатчик
+ *   2 - оптодатчик магнита
+ *   3 - нож открыт
+ *   4 - шт. открыт
+ *   5 - нож закрыт
  *   6 -
  *   7 -
  *
@@ -55,7 +55,6 @@ uint8_t err_tm;
 uint8_t fl_run_prg;			//флаг вып прг
 
 char mtk[8];					//
-//char usb_buf_rx[21];
 char usb_bef_tx[21];		//массив для передачи
 string usb_buf_rx;			//принятая команда
 int param[5];				//массив с параметрами команды
@@ -82,6 +81,8 @@ uint8_t bt = 100;			//скорость I2C
 uint8_t adr_pult = 0x43;	//адрес пульта
 uint8_t adr_ur_sens = 0x47;	//адрес платы фотоэлементов
 uint8_t adr_EEPROM = 0x50;	//адрес EEPROM
+
+
 
 uint8_t input_UR = 0b11111111;	//неактивное состояние датчиков
 uint8_t input_pult = 0b11111111;	//и кнопок
@@ -128,7 +129,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(300);
 									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(7450,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
+	m5:		RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
 
 			Pause(300);
 
@@ -208,6 +209,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 	m100:;
 
+	Event_err();
 }
 
 /*фото на магните без обрезки*/
@@ -242,7 +244,7 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(300);
 									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(7450,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
+	m5:		RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
 
 			Pause(300);
 
@@ -286,6 +288,7 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
 			Pause(500);
 
+			Event_err();
 }
 /*Программа печати фото без магнита*/
 void PrintFoto(void){
@@ -313,6 +316,8 @@ void PrintFoto(void){
 	Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ
 
 	Solenoid(SOL3_GLUE,0,"m9");
+
+	Event_err();
 }
 
 
@@ -357,7 +362,9 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char
 #endif
 				Pause(10);
 				fl_er = true;		//если счетчик больше таймаута
+#ifdef DEBUG
 				Msgint(fl_er);
+#endif
 				return;
 			}
 
@@ -493,7 +500,9 @@ return MOT_ERROR;
 			if(bitRead(input_UR, num_opt) == status){
 
 				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
+#ifdef DEBUG
 				Msgint(count_step);
+#endif
 				return MOT_OK;
 			}
 		}
@@ -744,7 +753,12 @@ void executeCommand(string data_rx)
 		RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 60,"m100");
 		RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m100");
 	}
-
+	else if(command.find("TestSol()")!= string::npos){
+		TestSol();
+	}
+	else if(command.find("TestInput()")!= string::npos){
+		TestInput();
+	}
 
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
@@ -772,78 +786,7 @@ void ArreyRx(string data_rx){
 void TestDev(void){
 
 
-	RunStepMotor(7500,120,1, opto_magn, 1 ,100, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
-	Pause(2000);
-	RunStepMotor(2000,120,1, -opto_magn, 1 ,100, "m1");
 
-/*
-	Pause(3000);
-	Solenoid(SOL1_VIR,0); 	//вкл
-	Pause(2000);
-	Solenoid(SOL1_VIR,1);	//выкл
-	Pause(2000);
-	Solenoid(SOL2_PODG,0);
-	Pause(2000);
-	Solenoid(SOL2_PODG,1);
-	Pause(2000);
-	Solenoid(SOL3_SKL, 0);
-	Pause(2000);
-	Solenoid(SOL3_SKL, 1);
-	Pause(2000);
-	Solenoid(SOL4, 0);
-	Pause(2000);
-	Solenoid(SOL4, 1);
-	Pause(2000);
-	//puts("m1");
-	RunMotor(DRAW_KD1_A,DRAW_KD1_B, 100, 1000,  0, 3, 0 , 20);//(speed_kd,steps_ust,current,num_opt,status ,timeout)
-	Pause(500);
-	//StopMotor(DRAW_KD1_A,DRAW_KD1_B);
-	//Pause(2000);
-	RunMotor(DRAW_KD1_A,DRAW_KD1_B, 100, -1000,  0, 3, 0 , TIMEOUT);
-	Pause(500);
-	//puts("m2");
-	RunMotor(DRAW_KD2_A,DRAW_KD2_B, 200, 1,  0, 3, 0 , TIMEOUT);
-	//Pause(2000);
-	StopMotor(DRAW_KD2_A,DRAW_KD2_B);
-	//Pause(500);
-	RunMotor(DRAW_KD2_A,DRAW_KD2_B, 200, -1,  0, 3, 0 , TIMEOUT);
-	//Pause(2000);
-	StopMotor(DRAW_KD2_A,DRAW_KD2_B);
-	//Pause(500);
-	//puts("SM");
-*/
-
-
-/*
-	//шатмп вверх(закр)
-	RunMotor(MOT_SHTAMP, 1000, 20000,  1000, -1, 0 , 50,"m0");//при закрытии исключить контроль по концевику или оптодатчику
-	Pause(500);
-	//штамп вниз(откр)(вывод А, вывод Б, шаги, код АЦП, номер оптодатчика, ожидаемый статус, таймаут)
-	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 50,"m0");
-	Pause(500);
-*/
-
-/*
-	RunMotor(MOT_CUT, 120, 2000,  4000, 5, 0 , 50,"m0");
-	Pause(500);
-	//шатмп вверх
-	RunMotor(MOT_CUT, 5, -2000,  3000, 3, 0 , 50,"m0");
-	Pause(500);
-	RunMotor(MOT_MAGN, 1000, 2000,  -4000, opto_magn, 0 , 50,"m0");
-	Pause(500);
-*/
-
-
-	//puts("m4");
-	//RunMotor(DRAW_KD4_A,DRAW_KD4_B, 200, 1,  0, 3, 0 , TIMEOUT);
-	//Pause(500);
-	//RunMotor(DRAW_KD4_A,DRAW_KD4_B, 200, -1,  0, 3, 0 , TIMEOUT);
-	//Pause(1000);
-
-	//RunStepMotor(50000,120,1, opto_print_in, 0 ,40, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
-	//Pause(500);
-	//RunStepMotor(-20000,120,1, 0, 0 ,100, "m2");//(int steps,uint8_t speed,uint32_t accel, uint8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt)
-	//Pause(2000);
 
 }
 
@@ -1074,4 +1017,102 @@ HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16
        while(HAL_I2C_Master_Transmit(hi2c, DevAddress, 0, 0, HAL_MAX_DELAY) != HAL_OK);
        return HAL_OK;
    }
+
+void Event_err(void){
+	if (1 == fl_er){
+		HAL_GPIO_WritePin(SOL1_ALIGN,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_SET);
+	}
+}
+
+void TestSol(void){
+	//соленойды
+	HAL_GPIO_WritePin(SOL1_ALIGN,GPIO_PIN_RESET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL1_ALIGN,GPIO_PIN_SET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_RESET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_RESET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_RESET);
+	Pause(500);
+	HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_SET);
+}
+
+/*   биты input_UR
+*   0 - оптодатчик наличия фото
+*   1 - оптодатчик
+*   2 - оптодатчик магнита
+*   3 - нож открыт
+*   4 - шт. открыт
+*   5 - нож закрыт
+*   6 -
+*   7 -
+*/
+
+void TestInput(void){
+	PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
+	if(bitRead(input_UR, 0) == 0){
+		Msg("Opto_foto open");
+	}
+	else{
+		Msg("Opto_foto close");
+	}
+
+	if(bitRead(input_UR, 1) == 0){
+		Msg("Opto_ open");
+	}
+	else{
+		Msg("Opto_ close");
+	}
+
+	if(bitRead(input_UR, 2) == 0){
+		Msg("Opto_magn open");
+	}
+	else{
+		Msg("Opto_magn close");
+	}
+
+	if(bitRead(input_UR, 3) == 0){
+		Msg("Cut_ open");
+	}
+
+	if(bitRead(input_UR, 4) == 0){
+		Msg("Sht_open");
+	}
+
+	if(bitRead(input_UR, 5) == 0){
+		Msg("Cut_close");
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

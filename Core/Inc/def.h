@@ -66,19 +66,24 @@ extern uint16_t pediod_T1;		//величина переполнения реги
 extern uint16_t pulse_T1;		//скважность
 extern int step;				//количество шагов
 extern uint8_t fl_accel;		//флаг ускорения
-//extern int t;
-#define pediod_T2 1600
-#define pulse_T2 pediod_T2/2
-#define F_cnt 100000			//частота тактирования счетчика
-#define steps_motor 200
-#define puse_motor
+
+//#define pediod_T2 1600
+//#define pulse_T2 pediod_T2/2
+//#define F_cnt 100000			//частота тактирования счетчика
+//#define steps_motor 200
+//#define puse_motor
+#define Pause	HAL_Delay		//Так удобнее
+#define TIMEOUT 10				//таймаут (Сек.)
+#define STEP_TO_CUT 7450		//количество шагов ШД до отрезания
+
+/*битовые операции*/
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)											//Читает бит под номером bit в числе value
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))											//Включает (ставит 1) бит под номером bit в числе value
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))										//Выключает (ставит 0) бит под номером bit в числе value
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))	//Ставит бит под номером bit в состояние bitvalue (0 или 1) в числе value
 #define bit(b) (1UL << (b))								`										//Возвращает 2 в степени bit
-#define Pause	HAL_Delay
-#define TIMEOUT 10				//таймаут (Сек.)
+
+
 
 /*кнопки пульта*/
 //ШД
@@ -160,6 +165,9 @@ void Foto_to_magn(uint16_t,uint8_t,uint8_t);
 void WaitForOptoStatus(uint8_t num,uint8_t status,uint8_t timeout,const char* mt);
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);
 void messege_err(char);
+void Event_err(void);			//проверка флага ошибки
+void TestSol(void);				//тест соленойдов
+void TestInput(void);
 
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt);
 StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B,uint16_t speed_kd,long steps_ust, int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt);	//запуск колекторного двигателя StartMotorShtamp(кол-во шагов, уставка датчика тока, таймаут)

@@ -103,9 +103,9 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
 
-	m1:		WaitForOptoStatus(opto_print_in,1,100,"m1");						// ожидание фото из принтера
+	m1:		WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
 
-			Pause(3000);
+			Pause(1000);
 
 #ifdef DEBUG
 			Msg("fl_er = ");
@@ -218,9 +218,9 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
 
-	m1:		WaitForOptoStatus(opto_print_in,1,100,"m1");						// ожидание фото из принтера
+	m1:		WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
 
-			Pause(3000);
+			Pause(1000);
 
 #ifdef DEBUG
 			Msg("fl_er = ");
@@ -292,8 +292,8 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 }
 /*Программа печати фото без магнита*/
 void PrintFoto(void){
-	WaitForOptoStatus(opto_print_in,1,100,"m1"); 		// Оптрон наличия бумаги
-	Pause(3000);
+	WaitForOptoStatus(opto_print_in,1,30000,"m1"); 		// Оптрон наличия бумаги
+	Pause(1000);
 
 	Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
 	Pause(500);
@@ -335,7 +335,7 @@ void MagnFrv(void){
  * то установить флаг ошибки и выйти. При срабатывании шунтируется.
  * 1 - наличие фото, 0 - отсутствие
  */
-void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char* mt){
+void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,const char* mt){
 	if(fl_er){
 	return;
 	}
@@ -344,7 +344,7 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint8_t timeout,const char
 		Msg("Wait opto");
 #endif
 		WriteMtk(mt);
-		timeout = (timeout*1000);
+		//timeout = (timeout*1000);
 		count_100ms = 0;
 
 		for(;;){

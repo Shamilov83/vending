@@ -45,7 +45,7 @@ extern uint8_t input_pult;		//и кнопок
 //extern uint8_t bt = 100;
 //extern string usb_buf_rx;
 extern char usb_buf_tx[21];		//буфер для передачи
-extern int param[5];		//буфер с параметрами команды
+extern int param[5];			//буфер с параметрами команды
 
 //#define otl 1
 extern uint8_t adr_ur_sens;		//адрес расширителя портов для фотодатчиков
@@ -162,7 +162,7 @@ void PrintFoto(void);
 void Service(void);
 void MagnFrv(void);
 void Foto_to_magn(uint16_t,uint8_t,uint8_t);
-void WaitForOptoStatus(uint8_t num,uint8_t status,uint8_t timeout,const char* mt);
+void WaitForOptoStatus(uint8_t num,uint8_t status,uint16_t timeout,const char* mt);
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);
 void messege_err(char);
 void Event_err(void);			//проверка флага ошибки

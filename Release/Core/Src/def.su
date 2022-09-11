@@ -1,32 +1,34 @@
-def.cpp:1095:1:void __static_initialization_and_destruction_0(int, int)	8	static
-def.cpp:651:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	16	static
-def.cpp:664:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	24	static
-def.cpp:770:6:void ArreyRx(std::string)	8	static
-def.cpp:786:6:void TestDev()	0	static
-def.cpp:793:6:void Service()	0	static
-def.cpp:948:6:void Msg(std::string)	16	dynamic
-def.cpp:967:6:void DWT_Init()	0	static
-def.cpp:973:6:void delay_micros(uint32_t)	0	static
-def.cpp:984:19:HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
-def.cpp:999:19:HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
-def.cpp:1021:6:void Event_err()	8	static
-def.cpp:1030:6:void TestSol()	8	static
+def.cpp:1109:1:void __static_initialization_and_destruction_0(int, int)	8	static
+def.cpp:649:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	16	static
+def.cpp:662:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	24	static
+def.cpp:771:6:void ArreyRx(std::string)	8	static
+def.cpp:787:6:void TestDev()	0	static
+def.cpp:794:6:void Service()	0	static
+def.cpp:949:6:void Msg(std::string)	16	dynamic
+def.cpp:968:6:void DWT_Init()	0	static
+def.cpp:974:6:void delay_micros(uint32_t)	0	static
+def.cpp:985:19:HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+def.cpp:1000:19:HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+def.cpp:1022:6:void Event_err()	8	static
+def.cpp:1032:6:void TestSol()	8	static
+def.cpp:1100:6:void ReadEEPROM()	0	static
+def.cpp:1106:6:void WriteEEPROM()	0	static
 string_conversions.h:54:5:) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	32	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = const char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
-def.cpp:942:6:void WriteMtk(const char*)	32	static
+def.cpp:943:6:void WriteMtk(const char*)	32	static
 def.cpp:389:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t, const char*)	48	static
-def.cpp:1060:6:void TestInput()	224	static
+def.cpp:1062:6:void TestInput()	224	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
-def.cpp:676:8:std::string convertCommandToIntList(std::string&, int*)	136	static
-def.cpp:960:6:void Msgint(int)	72	static
+def.cpp:674:8:std::string convertCommandToIntList(std::string&, int*)	136	static
+def.cpp:961:6:void Msgint(int)	72	static
 def.cpp:338:6:void WaitForOptoStatus(uint8_t, uint8_t, uint16_t, const char*)	96	static
-def.cpp:420:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t, const char*)	152	static
+def.cpp:418:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t, const char*)	152	static
 def.cpp:294:6:void PrintFoto()	32	static
-def.cpp:553:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t, const char*)	176	static
+def.cpp:551:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t, const char*)	176	static
 def.cpp:325:6:void MagnFrv()	40	static
-def.cpp:911:6:void InitDev()	56	static
+def.cpp:912:6:void InitDev()	56	static
 def.cpp:97:6:void Main_func(uint16_t, uint8_t, uint8_t)	176	static
 def.cpp:216:6:void Foto_to_magn(uint16_t, uint8_t, uint8_t)	128	static
-def.cpp:706:6:void executeCommand(std::string)	192	static,ignoring_inline_asm
-def.cpp:1095:1:cpp)	8	static
-def.cpp:1095:1:cpp)	8	static
+def.cpp:704:6:void executeCommand(std::string)	192	static,ignoring_inline_asm
+def.cpp:1109:1:cpp)	8	static
+def.cpp:1109:1:cpp)	8	static

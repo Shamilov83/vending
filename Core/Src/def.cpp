@@ -387,8 +387,6 @@ status:
  */
 
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
-
-
 	if(!fl_er){
 #ifdef DEBUG
 		Msg("Sol_");
@@ -493,9 +491,9 @@ return MOT_ERROR;
 		count_step++;
 /////////////////////////////////////////////////////////////////
 
-		PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
+		PortRead(&hi2c1, adr_ur_sens,&input_UR);					//опрос оптодатчиков
 
-		if(num_opt >= 0 ){								//если оспользуется оптодатчик
+		if(num_opt >= 0 ){											//если оспользуется оптодатчик
 			PortRead(&hi2c1, adr_ur_sens,&input_UR);
 			if(bitRead(input_UR, num_opt) == status){
 
@@ -507,15 +505,15 @@ return MOT_ERROR;
 			}
 		}
 			if(count_step >= step){
-			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
+			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);			//выключить ШД
 #ifdef DEBUG
 			Msg("count_step >= step");
 			Msgint(count_step);
 #endif
 			return MOT_OK;
 		}
-			else if(count_100ms > timeout ){				//если превышен таймаут
-			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
+			else if(count_100ms > timeout ){						//если превышен таймаут
+			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);			//выключить ШД
 
 #ifdef DEBUG
 			Msg("MT_TMT2_ST");
@@ -759,6 +757,9 @@ void executeCommand(string data_rx)
 	else if(command.find("TestInput()")!= string::npos){
 		TestInput();
 	}
+	else if(command.find("ShtampClose()")!= string::npos){
+			RunMotor(MOT_SHTAMP, 1000, 5000,  100, -1, 0 , 20,"m100");
+		}
 
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
@@ -979,7 +980,7 @@ void delay_micros(uint32_t us)
 
 
 /*
- * функция работы с EEPROM
+ * функции работы с I2C
  */
 HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len)
    {
@@ -1024,6 +1025,7 @@ void Event_err(void){
 		HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(SOL4_EJECT,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);				//выключить ШД
 	}
 }
 
@@ -1094,9 +1096,17 @@ void TestInput(void){
 
 }
 
+/*чтение структуры из EEPROM*/
+void ReadEEPROM(void){
 
 
+}
 
+/*запись структуры в EEPROM*/
+void WriteEEPROM(void){
+
+
+}
 
 
 

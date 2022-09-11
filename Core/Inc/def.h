@@ -33,6 +33,26 @@ typedef enum
   MOT_TIMEOUT  = 0x03U
 } StatusMotor;
 
+
+/*объявление типа данных _param. и экземпляр переменной данного типа parametrs*/
+typedef struct _param{
+	uint16_t count_magn;			//счетчик магнитов
+	uint16_t current_shtamp_close;	//ток штампа
+	uint16_t steps_to_cut;			//шаги до отрезки
+	uint16_t timeout_wait_foto;		//время ожидания фото,мс
+	uint16_t timeout_wait_magn;		//время ожидания магнита
+	uint16_t timeout_stamp;			//таймаут штампа
+	uint16_t timeout_sm_to_cut;		//таймаут ШД.работа от начала до отрезки
+	uint16_t timeout_sm_to_sht;		//таймаут ШД.работа отрезки до штампа
+	uint16_t pulse;					//длительность импульса тактирования ШД. (мс)
+}parametrs;
+
+typedef struct _exit_error{
+	uint8_t fl_er;					//флаг завершения с ошибкой
+	char mtk;						//имя метки где остановилась программа(здесь нужен массив символов)
+}exit_error;
+
+
 //флаги
 extern uint8_t fl_er;			//флаг выхода из программы с ошибкой
 extern uint8_t flag_stop;		//флаг остановки двигателя
@@ -74,7 +94,7 @@ extern uint8_t fl_accel;		//флаг ускорения
 //#define puse_motor
 #define Pause	HAL_Delay		//Так удобнее
 #define TIMEOUT 10				//таймаут (Сек.)
-#define STEP_TO_CUT 7450		//количество шагов ШД до отрезания
+#define STEP_TO_CUT 7450		//количество шагов ШД до отрезки
 
 /*битовые операции*/
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)											//Читает бит под номером bit в числе value
@@ -157,24 +177,26 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define opto_7 7
 
 
-void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout);
-void PrintFoto(void);
+void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout);	//функция печати фото с наклейкой на магнит и обрезанием по заданным параметрам
+void PrintFoto(void);											//функция печати фото без наклейки на магнит
 void Service(void);
-void MagnFrv(void);
-void Foto_to_magn(uint16_t,uint8_t,uint8_t);
-void WaitForOptoStatus(uint8_t num,uint8_t status,uint16_t timeout,const char* mt);
-void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);
+void MagnFrv(void);												//функция подачи магнита
+void Foto_to_magn(uint16_t,uint8_t,uint8_t);					//функция печати фото и наклкйка на магнит без обрезки
+void WaitForOptoStatus(uint8_t num,uint8_t status,uint16_t timeout,const char* mt);	//функция ожидания фото
+void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);		//управление соленойдом
 void messege_err(char);
 void Event_err(void);			//проверка флага ошибки
 void TestSol(void);				//тест соленойдов
 void TestInput(void);
+void ReadEEPROM(void);			//чтение данных из EEPROM
+void WriteEEPROM(void);			//запись данных из EEPROM
 
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt);
 StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B,uint16_t speed_kd,long steps_ust, int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt);	//запуск колекторного двигателя StartMotorShtamp(кол-во шагов, уставка датчика тока, таймаут)
 void StopMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B);
-HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len);
-HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len);
-void PortRead(I2C_HandleTypeDef *hi2c, uint8_t DevAddress, uint8_t *port);
+HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len);	//чтение  по интерфейсу I2C
+HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint8_t *pData, uint16_t len);	//запись по интерфейсу I2C
+void PortRead(I2C_HandleTypeDef *hi2c, uint8_t DevAddress, uint8_t *port);	//чтение портов расширения
 void WriteMtk(const char* mt);
 void DWT_Init(void);
 void delay_micros(uint32_t us);

@@ -34,7 +34,7 @@ typedef enum
 } StatusMotor;
 
 
-/*объявление типа данных _param. и экземпляр переменной данного типа parametrs*/
+/*объявление типа данных parametrs*/
 typedef struct _param{
 	uint16_t count_magn;			//счетчик магнитов
 	uint16_t current_shtamp_close;	//ток штампа
@@ -47,6 +47,7 @@ typedef struct _param{
 	uint16_t pulse;					//длительность импульса тактирования ШД. (мс)
 }parametrs;
 
+/*объявление типа данных exit_error*/
 typedef struct _exit_error{
 	uint8_t fl_er;					//флаг завершения с ошибкой
 	char mtk;						//имя метки где остановилась программа(здесь нужен массив символов)

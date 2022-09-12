@@ -143,6 +143,7 @@ Discarded input sections
  .data.bt       0x0000000000000000        0x1 ./Core/Src/def.o
  .data.input_pult
                 0x0000000000000000        0x1 ./Core/Src/def.o
+ .data.setting  0x0000000000000000       0x14 ./Core/Src/def.o
  .group         0x0000000000000000        0xc ./Core/Src/main.o
  .group         0x0000000000000000        0xc ./Core/Src/main.o
  .text          0x0000000000000000        0x0 ./Core/Src/main.o

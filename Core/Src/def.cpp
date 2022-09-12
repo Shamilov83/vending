@@ -82,7 +82,18 @@ uint8_t adr_pult = 0x43;	//адрес пульта
 uint8_t adr_ur_sens = 0x47;	//адрес платы фотоэлементов
 uint8_t adr_EEPROM = 0x50;	//адрес EEPROM
 
-
+parametrs setting = {
+		1111,
+		2222,
+		3333,
+		4444,
+		5555,
+		6666,
+		7777,
+		8888,
+		9999,
+		0
+	};
 
 uint8_t input_UR = 0b11111111;	//неактивное состояние датчиков
 uint8_t input_pult = 0b11111111;	//и кнопок
@@ -974,8 +985,8 @@ void DWT_Init(void)
 void delay_micros(uint32_t us)
 {
     uint32_t us_count_tic =  us * (SystemCoreClock / 1000000); // получаем кол-во тактов за 1 мкс и умножаем на наше значение
-    DWT->CYCCNT = 0U; 							// обнуляем счётчик
-    while(DWT->CYCCNT < us_count_tic);
+    DWT_CYCCNT = 0U; 							// обнуляем счётчик
+    while(DWT_CYCCNT < us_count_tic);
 }
 
 
@@ -1018,6 +1029,21 @@ HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16
        while(HAL_I2C_Master_Transmit(hi2c, DevAddress, 0, 0, HAL_MAX_DELAY) != HAL_OK);
        return HAL_OK;
    }
+
+
+
+/*чтение структуры из EEPROM*/
+void ReadEEPROM(void){
+
+
+}
+
+/*запись структуры в EEPROM*/
+void WriteEEPROM(void){
+
+
+}
+
 
 void Event_err(void){
 	if (1 == fl_er){
@@ -1096,17 +1122,6 @@ void TestInput(void){
 
 }
 
-/*чтение структуры из EEPROM*/
-void ReadEEPROM(void){
-
-
-}
-
-/*запись структуры в EEPROM*/
-void WriteEEPROM(void){
-
-
-}
 
 
 

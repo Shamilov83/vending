@@ -17,6 +17,7 @@ extern "C" {
 #include "stm32f1xx_hal.h"
 #include <string>
 
+#define DWT_CYCCNT  *(volatile uint32_t *)0xE0001004
 #define DWT_CONTROL *(volatile unsigned long *)0xE0001000
 #define SCB_DEMCR   *(volatile unsigned long *)0xE000EDFC
 
@@ -45,7 +46,10 @@ typedef struct _param{
 	uint16_t timeout_sm_to_cut;		//таймаут ШД.работа от начала до отрезки
 	uint16_t timeout_sm_to_sht;		//таймаут ШД.работа отрезки до штампа
 	uint16_t pulse;					//длительность импульса тактирования ШД. (мс)
-}parametrs;
+	uint16_t voltage_pw;			//напряжение ниже которого происходит останов программы и запись метки
+}parametrs ;
+
+extern parametrs setting;
 
 /*объявление типа данных exit_error*/
 typedef struct _exit_error{

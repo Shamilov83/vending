@@ -224,15 +224,15 @@ Disassembly of section .text:
  80002b4:	fb00 f003 	mul.w	r0, r0, r3
  80002b8:	4b05      	ldr	r3, [pc, #20]	; (80002d0 <_Z12delay_microsm+0x28>)
  80002ba:	2200      	movs	r2, #0
- 80002bc:	605a      	str	r2, [r3, #4]
+ 80002bc:	601a      	str	r2, [r3, #0]
  80002be:	4b04      	ldr	r3, [pc, #16]	; (80002d0 <_Z12delay_microsm+0x28>)
- 80002c0:	685b      	ldr	r3, [r3, #4]
+ 80002c0:	681b      	ldr	r3, [r3, #0]
  80002c2:	4283      	cmp	r3, r0
  80002c4:	d3fb      	bcc.n	80002be <_Z12delay_microsm+0x16>
  80002c6:	4770      	bx	lr
  80002c8:	20000004 	.word	0x20000004
  80002cc:	431bde83 	.word	0x431bde83
- 80002d0:	e0001000 	.word	0xe0001000
+ 80002d0:	e0001004 	.word	0xe0001004
 
 080002d4 <_Z9Event_errv>:
  80002d4:	4b10      	ldr	r3, [pc, #64]	; (8000318 <_Z9Event_errv+0x44>)

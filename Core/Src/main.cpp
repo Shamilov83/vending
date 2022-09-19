@@ -180,7 +180,7 @@ int main(void)
 
     //прочитать данные с EEPROM. если есть метка, то начать с неё.
 
-
+    ReadEEPROM();										//загрузить данные из EEPROM
     PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
 
     HAL_Delay(1000);

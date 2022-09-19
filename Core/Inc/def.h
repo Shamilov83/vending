@@ -25,7 +25,7 @@ extern "C" {
 
 extern I2C_HandleTypeDef hi2c1;
 
-//структура возвращаемого значения функций запуска двигателей
+/*возвращаемое значение функций запуска двигателей*/
 typedef enum
 {
   MOT_OK       = 0x00U,
@@ -36,6 +36,7 @@ typedef enum
 
 
 /*объявление типа данных parametrs*/
+
 typedef struct _param{
 	uint16_t count_magn;			//счетчик магнитов
 	uint16_t current_shtamp_close;	//ток штампа
@@ -181,6 +182,18 @@ extern uint8_t fl_accel;		//флаг ускорения
 #define opto_6 6
 #define opto_7 7
 
+/*имена элементов массива*/
+
+#define count_magn 				buffer_i2c[0]
+#define current_shtamp_close 	buffer_i2c[1]
+#define steps_to_cut 			buffer_i2c[2]
+#define timeout_wait_foto 		buffer_i2c[3]
+#define timeout_wait_magn		buffer_i2c[4]
+#define timeout_stamp 			buffer_i2c[5]
+#define timeout_sm_to_cut 		buffer_i2c[6]
+#define timeout_sm_to_sht 		buffer_i2c[7]
+#define pulse_pwm				buffer_i2c[8]
+#define voltage_pwr				buffer_i2c[9]
 
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout);	//функция печати фото с наклейкой на магнит и обрезанием по заданным параметрам
 void PrintFoto(void);											//функция печати фото без наклейки на магнит
@@ -195,6 +208,7 @@ void TestSol(void);				//тест соленойдов
 void TestInput(void);
 void ReadEEPROM(void);			//чтение данных из EEPROM
 void WriteEEPROM(void);			//запись данных из EEPROM
+void EraseEEPROM(uint16_t len);	//очистить EEPROM (кол-во байт)
 
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt);
 StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B,uint16_t speed_kd,long steps_ust, int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt);	//запуск колекторного двигателя StartMotorShtamp(кол-во шагов, уставка датчика тока, таймаут)

@@ -80,7 +80,24 @@ uint8_t flag_stop = 0;		//флаг остановки ШД
 uint8_t bt = 100;			//скорость I2C
 uint8_t adr_pult = 0x43;	//адрес пульта
 uint8_t adr_ur_sens = 0x47;	//адрес платы фотоэлементов
-uint8_t adr_EEPROM = 0x50;	//адрес EEPROM
+uint8_t adr_EEPROM = 0xA0;	//адрес EEPROM
+uint8_t strt_addr_ee = 0x00;//
+
+uint16_t buffer_i2c[20]={
+
+		0xFFFF,		//count_magn 			buffer_i2c[0]
+		0xFFFF,		//current_shtamp_close	buffer_i2c[1]
+		0xFFFF,		//steps_to_cut			buffer_i2c[2]
+		0xFFFF,		//timeout_wait_foto		buffer_i2c[3]
+		0xFFFF,		//timeout_wait_magn		buffer_i2c[4]
+		0xFFFF,		//timeout_stamp			buffer_i2c[5]
+		0xFFFF,		//timeout_sm_to_cut		buffer_i2c[6]
+		0xFFFF,		//timeout_sm_to_sht		buffer_i2c[7]
+		0xFFFF,		//pulse					buffer_i2c[8]
+		0xFFFF		//voltage_pw			buffer_i2c[9]
+};
+
+uint16_t buffer_i2c2[20];	//тестовый массив
 
 parametrs setting = {
 		1111,
@@ -92,13 +109,13 @@ parametrs setting = {
 		7777,
 		8888,
 		9999,
-		0
+		1234
 	};
 
-uint8_t input_UR = 0b11111111;	//неактивное состояние датчиков
+uint8_t input_UR = 0b11111111;		//неактивное состояние датчиков
 uint8_t input_pult = 0b11111111;	//и кнопок
 
-uint16_t usart_buf[10];		//приемный буфер
+uint16_t usart_buf[40];				//приемный буфер
 /*
  * Глобальные разрешение и запрет прерываний.
  * __disable_irq (); // запретить прерывания
@@ -770,7 +787,30 @@ void executeCommand(string data_rx)
 	}
 	else if(command.find("ShtampClose()")!= string::npos){
 			RunMotor(MOT_SHTAMP, 1000, 5000,  100, -1, 0 , 20,"m100");
-		}
+	}
+	else if(command.find("WriteEEPROM()")!= string::npos){
+			WriteEEPROM();
+	}
+	else if(command.find("ReadEEPROM()")!= string::npos){
+			ReadEEPROM();
+	}
+	else if(command.find("Set_cur_sht_cls()")!= string::npos){
+		buffer_i2c[1] = param[0];
+		WriteEEPROM();
+	}
+	else if(command.find("Set_steps_to_cut()")!= string::npos){
+		buffer_i2c[2] = param[0];
+		WriteEEPROM();
+	}
+	else if(command.find("Set_pulse_pwm()")!= string::npos){
+		buffer_i2c[8] = param[0];
+		WriteEEPROM();
+	}
+	else if(command.find("Set_voltage_pwr()")!= string::npos){
+		buffer_i2c[9] = param[0];
+		WriteEEPROM();
+	}
+
 
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
@@ -1035,15 +1075,74 @@ HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16
 /*чтение структуры из EEPROM*/
 void ReadEEPROM(void){
 
+	HAL_StatusTypeDef stat;
+	/*сканер адресов готовых к соитию*/
+/*
+	for(uint8_t i = 0; i < 255; i++){
+		stat = HAL_I2C_IsDeviceReady(&hi2c1, i, 1, 100);
+		Pause(10);
+		if(stat == HAL_OK){
+			Msgint(i);
+		}
+		else {
+			Msg("err_addr");
+			Pause(5);
+			Msgint(stat);
+		}
+	}
+*/
 
+	stat =  HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
+	if (HAL_OK == stat){
+		//Msg("IsDeveReady_OK");
+		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,(uint8_t*) buffer_i2c, 20);
+
+		for(uint8_t i = 0; i < 10;i++){
+			Msgint(buffer_i2c[i]);
+			Pause(5);
+		}
+
+	}
+/*
+	else{
+		Msg("IsDeveReady_ERR");
+		Pause(5);
+		Msgint(stat);
+	}
+*/
 }
 
-/*запись структуры в EEPROM*/
+/*запись массива в EEPROM*/
 void WriteEEPROM(void){
+	/*
+	for(uint8_t i = 0; i < 10;i++){
+			Msgint(buffer_i2c[i]);
+			Pause(5);
+		}
+	Msg("------------------");
+	*/
+	HAL_StatusTypeDef stat;
+	stat = HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
+	if(stat == HAL_OK){
+		EraseEEPROM(20);
+		Pause(10);
+		Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,(uint8_t*) buffer_i2c, 20);
+		Pause(10);
+		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,(uint8_t*) buffer_i2c2, 20);
 
-
+		for(uint8_t i = 0; i < 10;i++){
+			Msgint(buffer_i2c2[i]);
+			Pause(5);
+			}
+	}
 }
 
+void EraseEEPROM(uint16_t len){
+	uint16_t bufer_zero[len] = {0xFFFF};
+	HAL_StatusTypeDef stat;
+	stat = Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,(uint8_t*) bufer_zero, len);
+	//Msgint(stat);
+}
 
 void Event_err(void){
 	if (1 == fl_er){

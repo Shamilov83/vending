@@ -34,18 +34,20 @@
 #include "main.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "def.h"
 #include <string>
 #include <cstring>
 #include "usbd_cdc_if.h"
 #include "stm32f1xx_hal.h"
+#include "def.h"
+#include "def_func.h"
+#include "def_pin.h"
 
 using namespace std;
 
 void executeCommand(string data_rx);
-
 void Msg(string message);	//отправка сообщения в USB
 void Msgint(int val);		//отправка целочисленных данных в USB
+
 //флаги
 uint8_t fl_er;				//флаг завершения с ошибкой
 uint8_t fl_rx;				//принята команда
@@ -60,28 +62,23 @@ string usb_buf_rx;			//принятая команда
 int param[5];				//массив с параметрами команды
 
 
-uint16_t count_mg = 0;		//счетчик магнита
-uint8_t coun_prg = 0;		//счетчик выпонения программы
+uint16_t count_mg;			//счетчик магнита
+uint8_t coun_prg;			//счетчик выпонения программы
 int count_step;				//счетчик шагов ШД
-long count_taho = 0;		//счетчик тахогенератора
-uint32_t count_100ms = 0;	//счетчик 100мс
+long count_taho;			//счетчик тахогенератора
+uint32_t count_100ms;		//счетчик 100мс
 int step;					//абсолютное количество шагов
-//int t;
 
 uint16_t cod_ADC_PW;		//код АЦП напр. пит
 uint16_t cod_ADC_CS;		//код АЦП датчика тока штампа
 
-uint8_t accel_st;			//уставка ускорения ШД
-uint16_t pediod_T1 = 48000;
-uint16_t pulse_T1 = pediod_T1/2;
-uint8_t fl_accel = 0;		//флаг завершения ускорения
-uint8_t flag_stop = 0;		//флаг остановки ШД
 //адреса шины I2C
 uint8_t bt = 100;			//скорость I2C
 uint8_t adr_pult = 0x43;	//адрес пульта
 uint8_t adr_ur_sens = 0x47;	//адрес платы фотоэлементов
 uint8_t adr_EEPROM = 0xA0;	//адрес EEPROM
 uint8_t strt_addr_ee = 0x00;//
+
 
 uint16_t buffer_i2c[20]={
 
@@ -97,20 +94,7 @@ uint16_t buffer_i2c[20]={
 		0xFFFF		//voltage_pw			buffer_i2c[9]
 };
 
-uint16_t buffer_i2c2[20];	//тестовый массив
-
-parametrs setting = {
-		1111,
-		2222,
-		3333,
-		4444,
-		5555,
-		6666,
-		7777,
-		8888,
-		9999,
-		1234
-	};
+uint16_t buffer_i2c2[20];			//тестовый массив
 
 uint8_t input_UR = 0b11111111;		//неактивное состояние датчиков
 uint8_t input_pult = 0b11111111;	//и кнопок
@@ -499,7 +483,6 @@ return MOT_ERROR;
 			//break;
 			return MOT_TIMEOUT;
 		}
-
 	}
 
 #ifdef DEBUG
@@ -559,6 +542,69 @@ return MOT_ERROR;
 
 
 }
+
+StatusMotor CalibrSteps(void){
+
+	uint8_t speed = 100;
+	uint16_t count_step;
+	HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
+
+	for(;;){
+		//Строб ШД.
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		delay_micros(speed);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		delay_micros(speed);
+/////////////////////////////////////////////////////////////////
+		PortRead(&hi2c1, adr_ur_sens,&input_UR);
+		if(bitRead(input_UR, opto_print_in) == 0){
+		//count_step = 0;
+		break;
+		}
+		else if(count_100ms > 1000 ){
+#ifdef DEBUG
+			Msg("TMT_WAITING_FOTO");
+#endif
+			//fl_er = 1;
+			//break;
+			return MOT_TIMEOUT;
+		}
+	}
+
+	count_step = 0;
+
+	for(;;){
+		//Строб ШД
+////////////////////////////////////////////////////////////////
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_SET);
+		delay_micros(speed);
+		HAL_GPIO_WritePin( STEP_STEP_MOT,GPIO_PIN_RESET);
+		delay_micros(speed);
+		count_step++;
+/////////////////////////////////////////////////////////////////
+
+			PortRead(&hi2c1, adr_ur_sens,&input_UR);
+			if(bitRead(input_UR, opto_magn) == 1){
+
+				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
+#ifdef DEBUG
+				Msgint(count_step);
+#endif
+				buffer_i2c[2] = count_step;
+				WriteEEPROM();
+				return MOT_OK;
+			}
+			else if(count_100ms > 1000 ){							//если превышен таймаут
+			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);			//выключить ШД
+			return MOT_TIMEOUT;
+		}
+	}//for
+}
+
 
 
 /*
@@ -757,33 +803,33 @@ void executeCommand(string data_rx)
 	else if(command.find("MagnFrv()")!= string::npos){
 		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60,"m100");	//подача магнита
 	}
-	else if(command.find("Test()")!= string::npos){
-				TestDev();		//
+	else if(command.find("CalibrSteps()")!= string::npos){
+			CalibrSteps();
 	}
 	else if(command.find("ShtampOpen()")!= string::npos){
-		RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , 20,"m100");
+			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , 20,"m100");
 	}
 	else if(command.find("CutUp()")!= string::npos){
-		RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20,"m100");
+			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20,"m100");
 	}
 	else if(command.find("RunStepMot()")!= string::npos){
-		RunStepMotor(param[0],param[1],1, -1, 0 ,param[2], "m100");  //команда запуска ШД на N шагов RunStepMot(N |-N)
+			RunStepMotor(param[0],param[1],1, -1, 0 ,param[2], "m100");  //команда запуска ШД на N шагов RunStepMot(N |-N)
 	}
 	else if(command.find("Request_fl_er()")!= string::npos){		//запрос флага ошибки
-		Msgint(fl_er);
+			Msgint(fl_er);
 	}
 	else if(command.find("Foto_to_magn()")!= string::npos){
-		Foto_to_magn(param[0],param[1],param[2]);
+			Foto_to_magn(param[0],param[1],param[2]);
 	}
 	else if(command.find("Cut()")!= string::npos){
-		RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 60,"m100");
-		RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m100");
+			RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 60,"m100");
+			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m100");
 	}
 	else if(command.find("TestSol()")!= string::npos){
-		TestSol();
+			TestSol();
 	}
 	else if(command.find("TestInput()")!= string::npos){
-		TestInput();
+			TestInput();
 	}
 	else if(command.find("ShtampClose()")!= string::npos){
 			RunMotor(MOT_SHTAMP, 1000, 5000,  100, -1, 0 , 20,"m100");
@@ -795,20 +841,20 @@ void executeCommand(string data_rx)
 			ReadEEPROM();
 	}
 	else if(command.find("Set_cur_sht_cls()")!= string::npos){
-		buffer_i2c[1] = param[0];
-		WriteEEPROM();
+			buffer_i2c[1] = param[0];
+			WriteEEPROM();
 	}
 	else if(command.find("Set_steps_to_cut()")!= string::npos){
-		buffer_i2c[2] = param[0];
-		WriteEEPROM();
+			buffer_i2c[2] = param[0];
+			WriteEEPROM();
 	}
 	else if(command.find("Set_pulse_pwm()")!= string::npos){
-		buffer_i2c[8] = param[0];
-		WriteEEPROM();
+			buffer_i2c[8] = param[0];
+			WriteEEPROM();
 	}
 	else if(command.find("Set_voltage_pwr()")!= string::npos){
-		buffer_i2c[9] = param[0];
-		WriteEEPROM();
+			buffer_i2c[9] = param[0];
+			WriteEEPROM();
 	}
 
 
@@ -832,130 +878,6 @@ void ArreyRx(string data_rx){
 		fl_rx = 0;
 		return;
 	}
-}
-
-
-void TestDev(void){
-
-
-
-
-}
-
-void Service(void){
-/*
-	#define current 1000 //предел срабатывания датчика тока
-
-	PortRead(&hi2c1, adr_ur_sens,&input_UR);
-	Pause(5);
-	PortRead(&hi2c1, adr_pult,&input_pult);
-
-	if(bitRead(input_pult, stp_fr) == 0){		//ШД вперёд
-		TIM1->ARR = 1000;
-		TIM1->CCR1 = 500;
-		HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);
-		HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);
-	}
-	else if(bitRead(input_pult, stp_fr) == 1){
-			TIM1->CCR1 = 0;
-			HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_RESET);
-	}
-	else if(bitRead(input_pult, stp_bk) == 0){		//ШД назад
-			TIM1->ARR = 1000;
-			TIM1->CCR1 = 500;
-			HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);
-	}
-	else if(bitRead(input_pult, stp_bk) == 1){
-			TIM1->CCR1 = 0;
-			HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_RESET);
-	}
-	else if(bitRead(input_pult, sht_opn) == 0){		//открыть штамп
-			if(bitRead(input_UR, kv_sht_open) == 1){			//открывать пока не сработает концевик
-				HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_SET);
-			}
-			else {
-				HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_RESET);
-				Msg("sht_open");
-				Pause(10);
-			}
-	}
-	else if(bitRead(input_pult, sht_opn) == 1){
-			HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_RESET);
-	}
-	else if(bitRead(input_pult, sht_cls) == 0){		//закрыть штамп
-			HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_SET);
-			HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_RESET);
-
-			if(cod_ADC_CS >= current){
-				HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_RESET);
-				Msg("sht_close");
-				Pause(10);
-			}
-	}
-	else  if(bitRead(input_pult, sht_cls) == 1){
-			HAL_GPIO_WritePin( DRAW_KD1_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD1_B,GPIO_PIN_RESET);
-	}
-	else  if(bitRead(input_pult, mg_fr) == 0){		//магнит вперед
-			HAL_GPIO_WritePin( DRAW_KD2_A,GPIO_PIN_SET);
-			HAL_GPIO_WritePin( DRAW_KD2_B,GPIO_PIN_RESET);
-			Msg("mg_fr");
-			Pause(10);
-	}
-	else  if(bitRead(input_pult, mg_fr) == 1){
-			HAL_GPIO_WritePin( DRAW_KD2_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD2_B,GPIO_PIN_RESET);
-	}
-	else  if(bitRead(input_pult, mg_bk) == 0){		//магнит назад
-			HAL_GPIO_WritePin( DRAW_KD2_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD2_B,GPIO_PIN_SET);
-			Msg("mg_bk");
-			Pause(10);
-	}
-	else  if(bitRead(input_pult, mg_bk) == 1){
-			HAL_GPIO_WritePin( DRAW_KD2_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD2_B,GPIO_PIN_RESET);
-	}
-	else  if(bitRead(input_pult, cut_cls) == 0){		//нож вниз
-			if(bitRead(input_UR, 5) == 1){					//если не сработал концевой вкл. двиг
-				HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_SET);
-				HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_RESET);
-
-			}
-			else {
-				HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_RESET);
-				Msg("cut_close");
-				Pause(10);
-			}
-	}
-	else  if(bitRead(input_pult, cut_cls) == 1){
-			HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_RESET);
-	}
-	else  if(bitRead(input_pult, cut_opn) == 0){		//нож вверх
-			if(bitRead(input_UR, 3) == 0){
-				HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_SET);
-			}
-			else{
-				HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_RESET);
-				HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_RESET);
-				Msg("cut_open");
-				Pause(10);
-		}
-	}
-	else  if(bitRead(input_pult,cut_opn) == 1){
-			HAL_GPIO_WritePin( DRAW_KD3_A,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin( DRAW_KD3_B,GPIO_PIN_RESET);
-	}
-
-*/
 }
 
 
@@ -1218,9 +1140,7 @@ void TestInput(void){
 	if(bitRead(input_UR, 5) == 0){
 		Msg("Cut_close");
 	}
-
 }
-
 
 
 

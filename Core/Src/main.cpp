@@ -41,6 +41,8 @@
 #include <cstring>
 #include "def.h"
 #include "usbd_cdc_if.h"
+#include "def_func.h"
+#include "def_pin.h"
 
 using namespace std;
 //#include "i2c_er.h"
@@ -124,8 +126,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     	if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3) count_taho++;
     }
 }
-
-
 
 
 /* USER CODE END 0 */

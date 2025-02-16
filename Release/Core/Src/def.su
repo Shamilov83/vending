@@ -1,4 +1,4 @@
-def.cpp:1143:1:void __static_initialization_and_destruction_0(int, int)	8	static
+def.cpp:1174:1:void __static_initialization_and_destruction_0(int, int)	8	static
 def.cpp:723:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	16	static
 def.cpp:736:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	24	static
 def.cpp:868:6:void ArreyRx(std::string)	8	static
@@ -12,9 +12,9 @@ def.cpp:1069:6:void Event_err()	8	static
 def.cpp:1079:6:void TestSol()	8	static
 string_conversions.h:54:5:) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	32	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = const char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
+def.cpp:1109:6:void TestInput()	232	static
 def.cpp:916:6:void WriteMtk(const char*)	32	static
 def.cpp:401:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t, const char*)	48	static
-def.cpp:1109:6:void TestInput()	224	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
 def.cpp:748:8:std::string convertCommandToIntList(std::string&, int*)	136	static
 def.cpp:934:6:void Msgint(int)	72	static
@@ -30,5 +30,5 @@ def.cpp:109:6:void Main_func(uint16_t, uint8_t, uint8_t)	176	static
 def.cpp:228:6:void Foto_to_magn(uint16_t, uint8_t, uint8_t)	128	static
 def.cpp:546:13:StatusMotor CalibrSteps()	40	static
 def.cpp:778:6:void executeCommand(std::string)	192	static,ignoring_inline_asm
-def.cpp:1143:1:cpp)	8	static
-def.cpp:1143:1:cpp)	8	static
+def.cpp:1174:1:cpp)	8	static
+def.cpp:1174:1:cpp)	8	static

@@ -1108,37 +1108,68 @@ void TestSol(void){
 
 void TestInput(void){
 	PortRead(&hi2c1, adr_ur_sens,&input_UR);			//опрос оптодатчиков
-	if(bitRead(input_UR, 0) == 0){
-		Msg("Opto_foto open");
-	}
-	else{
-		Msg("Opto_foto close");
-	}
+	uint8_t tmp_reg = input_UR;
 
-	if(bitRead(input_UR, 1) == 0){
-		Msg("Opto_ open");
-	}
-	else{
-		Msg("Opto_ close");
-	}
+	for (uint16_t k = 0; k < 5000; k++) {
+		PortRead(&hi2c1, adr_ur_sens,&input_UR);
 
-	if(bitRead(input_UR, 2) == 0){
-		Msg("Opto_magn open");
-	}
-	else{
-		Msg("Opto_magn close");
-	}
+			if (bitRead(tmp_reg, 0) != bitRead(input_UR, 0)) {
+				if (bitRead(input_UR, 0) == 0) {
+					Msg("Opto_foto open");
+				}
+				else{
+					Msg("Opto_foto close");
+				}
+				bitWrite(tmp_reg, 0, bitRead(input_UR, 0));
+			}
 
-	if(bitRead(input_UR, 3) == 0){
-		Msg("Cut_ open");
-	}
 
-	if(bitRead(input_UR, 4) == 0){
-		Msg("Sht_open");
-	}
+			if (bitRead(tmp_reg, 1) != bitRead(input_UR, 1)) {
+				if (bitRead(input_UR, 1) == 0) {
+					Msg("Opto_ open");
+				}
+				else{
+					Msg("Opto_ close");
+				}
+				bitWrite(tmp_reg, 1, bitRead(input_UR, 1));
+			}
 
-	if(bitRead(input_UR, 5) == 0){
-		Msg("Cut_close");
+
+			if (bitRead(tmp_reg, 2) != bitRead(input_UR, 2)) {
+				if (bitRead(input_UR, 2) == 0) {
+					Msg("Opto_magn open");
+				}
+				else{
+					Msg("Opto_magn close");
+				}
+				bitWrite(tmp_reg, 2, bitRead(input_UR, 2));
+			}
+
+
+			if (bitRead(tmp_reg, 3) != bitRead(input_UR, 3)) {
+				if (bitRead(input_UR, 3) == 0) {
+					Msg("Cut_ open");
+				}
+
+				bitWrite(tmp_reg, 3, bitRead(input_UR, 3));
+			}
+
+			if (bitRead(tmp_reg, 4) != bitRead(input_UR, 4)) {
+				if (bitRead(input_UR, 4) == 0) {
+					Msg("Sht_open");
+				}
+				bitWrite(tmp_reg, 4, bitRead(input_UR, 4));
+			}
+
+
+			if (bitRead(tmp_reg, 5) != bitRead(input_UR, 5)) {
+				if (bitRead(input_UR, 5) == 0) {
+				Msg("Cut_close");
+				}
+				bitWrite(tmp_reg, 5, bitRead(input_UR, 5));
+			}
+
+		Pause(100);
 	}
 }
 

@@ -24,15 +24,15 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout);	//функция �
 void PrintFoto(void);											//функция печати фото без наклейки на магнит
 void MagnFrv(void);												//функция подачи магнита
 void Foto_to_magn(uint16_t,uint8_t,uint8_t);					//функция печати фото и наклкйка на магнит без обрезки
-void WaitForOptoStatus(uint8_t num,uint8_t status,uint16_t timeout,const char* mt);	//функция ожидания фото
-void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);		//управление соленойдом
+StatusMotor WaitForOptoStatus(uint8_t num,uint8_t status,uint16_t timeout,const char* mt);	//функция ожидания фото
+void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN, uint8_t status,const char* mt);				//управление соленойдом
 void messege_err(char);
-void Event_err(void);			//проверка флага ошибки
-void TestSol(void);				//тест соленойдов
+void Event_err(void);					//проверка флага ошибки
+void TestSol(void);						//тест соленойдов
 void TestInput(void);
-void ReadEEPROM(void);			//чтение данных из EEPROM
-void WriteEEPROM(void);			//запись данных из EEPROM
-void EraseEEPROM(uint16_t len);	//очистить EEPROM (кол-во байт)
+void ReadEEPROM(void);					//чтение данных из EEPROM
+void WriteEEPROM(void);					//запись данных из EEPROM
+void EraseEEPROM(uint16_t len);			//очистить EEPROM (кол-во байт)
 StatusMotor CalibrSteps(void);			//замер шагов от начала до отрезки и запись в EEPROM
 
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt);

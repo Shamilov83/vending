@@ -48,6 +48,8 @@ void executeCommand(string data_rx);
 void Msg(string message);	//отправка сообщения в USB
 void Msgint(int val);		//отправка целочисленных данных в USB
 
+uint8_t DEBUG = 1;
+
 //флаги
 uint8_t fl_er;				//флаг завершения с ошибкой
 uint8_t fl_rx;				//принята команда
@@ -106,23 +108,35 @@ uint16_t usart_buf[40];				//приемный буфер
  * __enable_irq ();  // разрешить прерывания
  */
 
+/*
+typedef enum
+{
+  MOT_OK       = 0x00U,
+  MOT_ERROR    = 0x01U,
+  MOT_BUSY     = 0x02U,
+  MOT_TIMEOUT  = 0x03U
+} StatusMotor;
+*/
+
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
+	StatusMotor	 stat;
+
 /*проверку флага ошибки нужно производить перед вызовом функции*/
-#ifdef DEBUG
+if (DEBUG == 1) {
 			Msg("----Start----");
-#endif
+}
 
-	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
+	m0:		stat = RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
 
 
-	m1:		WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
+	m1:		stat = WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
 
 			Pause(1000);
 
-#ifdef DEBUG
+if (DEBUG == 1) {
 			Msg("fl_er = ");
 			Msgint(fl_er);
-#endif
+}
 
 	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
 			Pause(300);
@@ -141,7 +155,7 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(300);
 									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
+	m5:		stat = RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
 
 			Pause(300);
 
@@ -161,54 +175,55 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
 
-			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
+			stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
 
-	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout,"m70");
+	m70:	stat = RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout,"m70");
 			Pause(500);
 
-	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
+	m20:	stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
 
 
-#ifdef DEBUG
-			Msg("fl_er = ");
-			Msgint(fl_er);
-#endif
+			if (DEBUG == 1) {
+				Msg("fl_er = ");
+				Msgint(fl_er);
+			}
 	////////////////////////////////////////////////////////////////
 
 
 			Pause(500);
 			//старт ШД на N шагов из входных параметров главной функции
-	m8:		RunStepMotor(Steps,120,1, -1, 0 ,timeout, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	m8:		stat = RunStepMotor(Steps,120,1, -1, 0 ,timeout, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 			Pause(500);
 
 	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
 			Pause(500);
 
-#ifdef DEBUG
-			Msg("fl_er = ");
-			Msgint(fl_er);
-#endif
+			if (DEBUG == 1) {
+				Msg("fl_er = ");
+				Msgint(fl_er);
+			}
+
 	//////////////////штамповка///////////////////////////////////////
-			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
+			stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 
 
 
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 1000, -1000,  900, -kv_sht_open, 0 , timeout,"m0");
+			stat = RunMotor(MOT_SHTAMP, 1000, -1000,  900, -kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
 			//шатмп вверх(закр)
-			RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
+			stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
 			Pause(500);
 
 
 
 			//штамп вниз(откр)
-			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
+			stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
 			Pause(500);
 
 
@@ -216,13 +231,18 @@ void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 			//выход из штампа
 			Pause(500);
 				//старт ШД на N шагов
-			RunStepMotor(-2000,120,1, -1, 0 ,timeout, "m18");
-	m18:	RunStepMotor(20000,120,1, -1, 0 ,timeout, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+			stat = RunStepMotor(-2000,120,1, -1, 0 ,timeout, "m18");
+	m18:	stat = RunStepMotor(20000,120,1, -1, 0 ,timeout, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
-	m100:;
+	m100:
 
 	Event_err();
+		if (stat != MOT_OK) {
+					;
+		}
 }
+
+
 
 /*фото на магните без обрезки*/
 void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
@@ -234,10 +254,10 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 
 			Pause(1000);
 
-#ifdef DEBUG
+			if (DEBUG == 1) {
 			Msg("fl_er = ");
 			Msgint(fl_er);
-#endif
+			}
 
 	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
 			Pause(300);
@@ -284,10 +304,10 @@ void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
 	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
 
 
-#ifdef DEBUG
+			if (DEBUG == 1) {
 			Msg("fl_er = ");
 			Msgint(fl_er);
-#endif
+			}
 	////////////////////////////////////////////////////////////////
 
 
@@ -347,14 +367,14 @@ void MagnFrv(void){
  * то установить флаг ошибки и выйти. При срабатывании шунтируется.
  * 1 - наличие фото, 0 - отсутствие
  */
-void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,const char* mt){
+StatusMotor WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,const char* mt){
 	if(fl_er){
-	return;
+	return MOT_ERROR;
 	}
 
-#ifdef DEBUG
+	   if (DEBUG == 1) {
 		Msg("Wait opto");
-#endif
+	   }
 		WriteMtk(mt);
 		//timeout = (timeout*1000);
 		count_100ms = 0;
@@ -363,26 +383,28 @@ void WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,const cha
 			PortRead(&hi2c1, adr_ur_sens,&input_UR);
 
 			if(bitRead(input_UR, num_opt) == status) {
-#ifdef DEBUG
-				Msg("Event opto1");
-#endif
+
+				if (DEBUG == 1) {
+					Msg("Event opto1");
+				}
+
 				break;
 			}
 			else if(count_100ms > timeout){
-#ifdef DEBUG
-				Msg("Timeout opto1");
-#endif
+				if (DEBUG == 1) {
+					Msg("Timeout opto1");//что-то надо вернуть
+				}
 				Pause(10);
 				fl_er = true;		//если счетчик больше таймаута
-#ifdef DEBUG
-				Msgint(fl_er);
-#endif
-				return;
+				if (DEBUG == 1) {
+					Msgint(fl_er);
+				}
+				return MOT_TIMEOUT;
 			}
 
 			HAL_Delay(10);
 		}
-
+return MOT_OK;
 }
 
 
@@ -400,9 +422,9 @@ status:
 
 void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
 	if(!fl_er){
-#ifdef DEBUG
-		Msg("Sol_");
-#endif
+		if (DEBUG == 1) {
+			Msg("Sol_");
+		}
 		WriteMtk(mt);
 		if(status == 0) HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_RESET);
@@ -428,13 +450,13 @@ void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
  * если оптодатчик указан со знаком минул, он не контролируется
  */
 StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt){
-if(fl_er){
-return MOT_ERROR;
+if	(fl_er)	{
+	return MOT_ERROR;
 }
 
-#ifdef DEBUG
+if (DEBUG == 1) {
 	Msg("Start Step mot");
-#endif
+}
 
 	WriteMtk(mt);
 	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
@@ -476,18 +498,18 @@ return MOT_ERROR;
 		break;
 		}
 		else if(count_100ms > 1000 ){
-#ifdef DEBUG
-			Msg("MT_TMT1_SM");
-#endif
+			if (DEBUG == 1) {
+				Msg("MT_TMT1_SM");
+			}
 			//fl_er = 1;
 			//break;
 			return MOT_TIMEOUT;
 		}
 	}
 
-#ifdef DEBUG
-	Msg("count_step = 0");
-#endif
+	if (DEBUG == 1) {
+		Msg("count_step = 0");
+	}
 
 	count_step = 0;
 	for(;;){
@@ -509,31 +531,31 @@ return MOT_ERROR;
 			if(bitRead(input_UR, num_opt) == status){
 
 				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
-#ifdef DEBUG
-				Msgint(count_step);
-#endif
+				if (DEBUG == 1) {
+					Msgint(count_step);
+				}
 				return MOT_OK;
 			}
 		}
 			if(count_step >= step){
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);			//выключить ШД
-#ifdef DEBUG
-			Msg("count_step >= step");
-			Msgint(count_step);
-#endif
+			if (DEBUG == 1) {
+				Msg("count_step >= step");
+				Msgint(count_step);
+			}
 			return MOT_OK;
 		}
 			else if(count_100ms > timeout ){						//если превышен таймаут
 			HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);			//выключить ШД
 
-#ifdef DEBUG
-			Msg("MT_TMT2_ST");
-#endif
+			if (DEBUG == 1) {
+				Msg("MT_TMT2_ST");
+			}
 			Pause(10);
 			fl_er = true;
-#ifdef DEBUG
-			Msgint(fl_er);
-#endif
+			if (DEBUG == 1) {
+				Msgint(fl_er);
+			}
 			return MOT_TIMEOUT;
 		}
 
@@ -565,9 +587,9 @@ StatusMotor CalibrSteps(void){
 		break;
 		}
 		else if(count_100ms > 1000 ){
-#ifdef DEBUG
-			Msg("TMT_WAITING_FOTO");
-#endif
+			if (DEBUG == 1) {
+				Msg("TMT_WAITING_FOTO");
+			}
 			//fl_er = 1;
 			//break;
 			return MOT_TIMEOUT;
@@ -591,9 +613,9 @@ StatusMotor CalibrSteps(void){
 			if(bitRead(input_UR, opto_magn) == 1){
 
 				HAL_GPIO_WritePin(EN_STEP_MOT,GPIO_PIN_RESET);		//выключить ШД
-#ifdef DEBUG
-				Msgint(count_step);
-#endif
+				if (DEBUG == 1) {
+					Msgint(count_step);
+				}
 				buffer_i2c[2] = count_step;
 				WriteEEPROM();
 				return MOT_OK;
@@ -628,9 +650,9 @@ if(fl_er){
 return MOT_ERROR;
 }			//если не установлен флаг ошибки
 
-#ifdef DEBUG
-Msg("Start KD");
-#endif
+if (DEBUG == 1) {
+	Msg("Start KD");
+}
 
 WriteMtk(mt);
 count_100ms = 0;		//обнулить счетчик таймаута.
@@ -670,9 +692,9 @@ if(num_opt >= 0 ){							//если используется датчик
 						PortRead(&hi2c1, adr_ur_sens,&input_UR);
 						if(bitRead(input_UR, num_opt) == status){
 							//if(fl_deb == status){
-#ifdef DEBUG
-							Msg("Status!");
-#endif
+							if (DEBUG == 1) {
+								Msg("Status!");
+							}
 							StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 							return MOT_OK;
 						}
@@ -680,33 +702,33 @@ if(num_opt >= 0 ){							//если используется датчик
 						Pause(500);
 					if(current > 0){
 						if(cod_ADC_CS >= current){
-#ifdef DEBUG
-						Msg("cod_ADC_CS >= current");
-#endif
+							if (DEBUG == 1) {
+								Msg("cod_ADC_CS >= current");
+							}
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						return MOT_OK;
 						}
 					}
 
 						if(count_taho >= steps_ust){
-#ifdef DEBUG
-						Msg("count_taho >= steps_ust");
-#endif
+							if (DEBUG == 1) {
+								Msg("count_taho >= steps_ust");
+							}
 						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
 						return MOT_OK;
 					}
 						if(count_100ms > timeout ){				//если превышен таймаут
-						StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
-#ifdef DEBUG
-						Msg("MT_TMT");
-#endif
-						fl_er = true;
-						Pause(10);
-#ifdef DEBUG
-						Msgint(fl_er);
-#endif
+							StopMotor(DRAW_A,PIN_A,DRAW_B,PIN_B);
+							if (DEBUG == 1) {
+								Msg("MT_TMT");
+							}
+							fl_er = true;
+							Pause(10);
+							if (DEBUG == 1) {
+								Msgint(fl_er);
+							}
 						return MOT_TIMEOUT;
-					}
+						}
 
 			}
 
@@ -870,11 +892,11 @@ void executeCommand(string data_rx)
 			WriteEEPROM();
 	}
 
-	else if(command.find("Enable debug()")!= string::npos){
-			#define DEBUG 1
+	else if(command.find("Enable_debug()")!= string::npos){
+			DEBUG = 1;
 	}
-	else if(command.find("Disable debug()")!= string::npos){
-			#undef DEBUG
+	else if(command.find("Disable_debug()")!= string::npos){
+			DEBUG = 0;
 	}
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
@@ -1063,20 +1085,23 @@ void WriteEEPROM(void){
 	Msg("------------------");
 	*/
 
-
+	uint8_t tmp_reg[20] = {0xFF};
 	HAL_StatusTypeDef stat;
 	stat = HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
 	if (stat == HAL_OK) {
 		EraseEEPROM(20);
 		Pause(10);
+		stat = Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,tmp_reg, 1);
+		Pause(10);
 		stat = Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
 		Pause(10);
-		stat = Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
-
-		for(uint8_t i = 0; i < 10;i++){
-			Msgint(buffer_i2c[i]);
-			Pause(5);
+		if (DEBUG == 1) {
+			stat = Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
+			for(uint8_t i = 0; i < 10;i++){
+				Msgint(buffer_i2c[i]);
+				Pause(5);
 			}
+		}
 	}
 
 

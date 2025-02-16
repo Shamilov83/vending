@@ -15,8 +15,6 @@ extern "C" {
 
 #include <string>
 #include "stm32f1xx_hal.h"
-
-#define DEBUG 1
 //#define otl 1
 
 #define DWT_CYCCNT  *(volatile uint32_t *)0xE0001004
@@ -84,6 +82,7 @@ extern uint16_t pulse_T1;		//скважность
 extern int step;				//количество шагов
 extern uint8_t fl_accel;		//флаг ускорения
 
+extern uint8_t DEBUG;
 /*
 #ifdef __cplusplus
 }

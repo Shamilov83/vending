@@ -80,19 +80,19 @@ uint8_t adr_EEPROM = 0xA0;	//адрес EEPROM
 uint8_t strt_addr_ee = 0x00;//
 
 
-uint16_t buffer_i2c[20]={
+uint8_t buffer_i2c[20];
 
-		0xFFFF,		//count_magn 			buffer_i2c[0]
-		0xFFFF,		//current_shtamp_close	buffer_i2c[1]
-		0xFFFF,		//steps_to_cut			buffer_i2c[2]
-		0xFFFF,		//timeout_wait_foto		buffer_i2c[3]
-		0xFFFF,		//timeout_wait_magn		buffer_i2c[4]
-		0xFFFF,		//timeout_stamp			buffer_i2c[5]
-		0xFFFF,		//timeout_sm_to_cut		buffer_i2c[6]
-		0xFFFF,		//timeout_sm_to_sht		buffer_i2c[7]
-		0xFFFF,		//pulse					buffer_i2c[8]
-		0xFFFF		//voltage_pw			buffer_i2c[9]
-};
+//count_magn 			buffer_i2c[0]
+//current_shtamp_close	buffer_i2c[2]
+//steps_to_cut			buffer_i2c[4]
+//timeout_wait_foto		buffer_i2c[6]
+//timeout_wait_magn		buffer_i2c[8]
+//timeout_stamp			buffer_i2c[10]
+//timeout_sm_to_cut		buffer_i2c[12]
+//timeout_sm_to_sht		buffer_i2c[14]
+//pulse					buffer_i2c[16]
+//voltage_pw			buffer_i2c[18]
+
 
 uint16_t buffer_i2c2[20];			//тестовый массив
 
@@ -840,24 +840,42 @@ void executeCommand(string data_rx)
 	else if(command.find("ReadEEPROM()")!= string::npos){
 			ReadEEPROM();
 	}
-	else if(command.find("Set_cur_sht_cls()")!= string::npos){
-			buffer_i2c[1] = param[0];
+	else if(command.find("Set_count_magn()")!= string::npos){		//count_magn
+			buffer_i2c[0] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Set_steps_to_cut()")!= string::npos){
+	else if(command.find("Set_cur_sht_cls()")!= string::npos){		//ток штампа
 			buffer_i2c[2] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Set_pulse_pwm()")!= string::npos){
+	else if(command.find("Set_steps_to_cut()")!= string::npos){		//шаги до ножа
+			buffer_i2c[4] = param[0];
+			WriteEEPROM();
+	}
+	else if(command.find("Timeout_wait_foto()")!= string::npos){
+			buffer_i2c[6] = param[0];
+			WriteEEPROM();
+	}
+	else if(command.find("Timeout_magn()")!= string::npos){			//таймаут ожидания магнита
 			buffer_i2c[8] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Set_voltage_pwr()")!= string::npos){
-			buffer_i2c[9] = param[0];
+	else if(command.find("Timeout_shtamp()")!= string::npos){
+			buffer_i2c[10] = param[0];
 			WriteEEPROM();
 	}
 
+	else if(command.find("Set_voltage_pwr()")!= string::npos){		//порог сигнализации отключения питания
+			buffer_i2c[18] = param[0];
+			WriteEEPROM();
+	}
 
+	else if(command.find("Enable debug()")!= string::npos){
+			#define DEBUG 1
+	}
+	else if(command.find("Disable debug()")!= string::npos){
+			#undef DEBUG
+	}
 	usb_buf_rx.clear();	//очистить переменную
 	fl_rx = 0;
 }
@@ -1017,7 +1035,7 @@ void ReadEEPROM(void){
 	stat =  HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
 	if (HAL_OK == stat){
 		//Msg("IsDeveReady_OK");
-		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,(uint8_t*) buffer_i2c, 20);
+		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
 
 		for(uint8_t i = 0; i < 10;i++){
 			Msgint(buffer_i2c[i]);
@@ -1025,6 +1043,7 @@ void ReadEEPROM(void){
 		}
 
 	}
+
 /*
 	else{
 		Msg("IsDeveReady_ERR");
@@ -1043,20 +1062,24 @@ void WriteEEPROM(void){
 		}
 	Msg("------------------");
 	*/
+
+
 	HAL_StatusTypeDef stat;
 	stat = HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
-	if(stat == HAL_OK){
+	if (stat == HAL_OK) {
 		EraseEEPROM(20);
 		Pause(10);
-		Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,(uint8_t*) buffer_i2c, 20);
+		stat = Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
 		Pause(10);
-		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,(uint8_t*) buffer_i2c2, 20);
+		stat = Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
 
 		for(uint8_t i = 0; i < 10;i++){
-			Msgint(buffer_i2c2[i]);
+			Msgint(buffer_i2c[i]);
 			Pause(5);
 			}
 	}
+
+
 }
 
 void EraseEEPROM(uint16_t len){

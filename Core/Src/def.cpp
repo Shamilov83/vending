@@ -780,10 +780,10 @@ void executeCommand(string data_rx)
 	//Msg("--Build arrea--");
 	string command = convertCommandToIntList(data_rx, param);
 	//Msg("executeCommand...\r\n");
-	if (command.find("Reboot()") != string::npos) { 	//если строка найдена. string::npos(-1) возвращается если заданная строка не найдена.
+	if (command.find("Reboot()") != string::npos) { 						//если строка найдена. string::npos(-1) возвращается если заданная строка не найдена.
 		Msg("Reboot devace...\r\n");
-		   __set_FAULTMASK(1);							// Запрещаем все маскируемые прерывания //связь виснет нужен ресет шины
-		   NVIC_SystemReset();							// Программный сброс
+		   __set_FAULTMASK(1);												// Запрещаем все маскируемые прерывания //связь виснет нужен ресет шины
+		   NVIC_SystemReset();												// Программный сброс
 		   usb_buf_rx.clear();
 	}
 	else if (command.find("Connect()") != string::npos) {
@@ -791,14 +791,14 @@ void executeCommand(string data_rx)
 	}
 	else if (command.find("RunPrg()") != string::npos) {
 			Msg("RunPrgramm...\r\n");
-			Main_func (param[0],param[1],param[2]);		//запуск основной программы
+			Main_func (param[0],param[1],param[2]);							//запуск основной программы
 	}
 	else if(command.find("ResetError()")!= string::npos){
 			Msg("ResetError...\r\n");
-			fl_er = 0;									//сброс флага ошибки
+			fl_er = 0;														//сброс флага ошибки
 	}
 	else if(command.find("PrintFoto()")!= string::npos){
-			PrintFoto();								//печать фото
+			PrintFoto();													//печать фото
 	}
 	else if(command.find("MagnFrv()")!= string::npos){
 		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60,"m100");	//подача магнита
@@ -813,9 +813,9 @@ void executeCommand(string data_rx)
 			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20,"m100");
 	}
 	else if(command.find("RunStepMot()")!= string::npos){
-			RunStepMotor(param[0],param[1],1, -1, 0 ,param[2], "m100");  //команда запуска ШД на N шагов RunStepMot(N |-N)
+			RunStepMotor(param[0],param[1],1, -1, 0 ,param[2], "m100");  	//команда запуска ШД на N шагов RunStepMot(N |-N)
 	}
-	else if(command.find("Request_fl_er()")!= string::npos){		//запрос флага ошибки
+	else if(command.find("Request_fl_er()")!= string::npos){				//запрос флага ошибки
 			Msgint(fl_er);
 	}
 	else if(command.find("Foto_to_magn()")!= string::npos){
@@ -840,15 +840,15 @@ void executeCommand(string data_rx)
 	else if(command.find("ReadEEPROM()")!= string::npos){
 			ReadEEPROM();
 	}
-	else if(command.find("Set_count_magn()")!= string::npos){		//count_magn
+	else if(command.find("Set_count_magn()")!= string::npos){					//count_magn
 			buffer_i2c[0] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Set_cur_sht_cls()")!= string::npos){		//ток штампа
+	else if(command.find("Set_cur_sht_cls()")!= string::npos){					//ток штампа
 			buffer_i2c[2] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Set_steps_to_cut()")!= string::npos){		//шаги до ножа
+	else if(command.find("Set_steps_to_cut()")!= string::npos){					//шаги до ножа
 			buffer_i2c[4] = param[0];
 			WriteEEPROM();
 	}
@@ -856,7 +856,7 @@ void executeCommand(string data_rx)
 			buffer_i2c[6] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Timeout_magn()")!= string::npos){			//таймаут ожидания магнита
+	else if(command.find("Timeout_magn()")!= string::npos){						//таймаут ожидания магнита
 			buffer_i2c[8] = param[0];
 			WriteEEPROM();
 	}
@@ -865,7 +865,7 @@ void executeCommand(string data_rx)
 			WriteEEPROM();
 	}
 
-	else if(command.find("Set_voltage_pwr()")!= string::npos){		//порог сигнализации отключения питания
+	else if(command.find("Set_voltage_pwr()")!= string::npos){					//порог сигнализации отключения питания
 			buffer_i2c[18] = param[0];
 			WriteEEPROM();
 	}

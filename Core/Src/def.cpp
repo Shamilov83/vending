@@ -54,9 +54,9 @@ uint8_t DEBUG = 1;
 uint8_t fl_er;				//флаг завершения с ошибкой
 uint8_t fl_rx;				//принята команда
 
-bool fl_run_pr = 0;			//флаг выпонения программы. выставляется после запуска
+//bool fl_run_pr = 0;			//флаг выпонения программы. выставляется после запуска
 uint8_t err_tm;
-uint8_t fl_run_prg;			//флаг вып прг
+uint8_t fl_run_prg;			//флаг выполнения  программы
 
 char mtk[8];					//
 char usb_bef_tx[21];		//массив для передачи
@@ -108,133 +108,86 @@ uint16_t usart_buf[40];				//приемный буфер
  * __enable_irq ();  // разрешить прерывания
  */
 
-/*
-typedef enum
-{
-  MOT_OK       = 0x00U,
-  MOT_ERROR    = 0x01U,
-  MOT_BUSY     = 0x02U,
-  MOT_TIMEOUT  = 0x03U
-} StatusMotor;
-*/
-
 void Main_func (uint16_t Steps,uint8_t stor,uint8_t timeout){
 	StatusMotor	 stat;
 
 /*проверку флага ошибки нужно производить перед вызовом функции*/
-if (DEBUG == 1) {
-			Msg("----Start----");
-}
+	if (DEBUG == 1) {
+		Msg("----Start----");
+	}
 
-	m0:		stat = RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
-
-
-	m1:		stat = WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
-
-			Pause(1000);
-
-if (DEBUG == 1) {
-			Msg("fl_er = ");
-			Msgint(fl_er);
-}
-
-	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
-			Pause(300);
-			Solenoid(SOL1_ALIGN,0,"m2");
-			Pause(300);
-			Solenoid(SOL1_ALIGN,1,"m2");
-
-			Pause(300);
-
-	m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
-
-			Pause(300);
-
-	m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
-
-
-			Pause(300);
-									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		stat = RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
-
-			Pause(300);
-
-			Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
-
+	stat = RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout);	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
+	stat = WaitForOptoStatus(opto_print_in,1,30000);						// ожидание фото из принтера
+	Pause(1000);
+	if (DEBUG == 1) {
+		Msg("fl_er = ");
+		Msgint(fl_er);
+	}
+	Solenoid(SOL1_ALIGN,1); 		// ВЫРАВНИВАТЕЛЬ
+	Pause(300);
+	Solenoid(SOL1_ALIGN,0);
+	Pause(300);
+	Solenoid(SOL1_ALIGN,1);
+	Pause(300);
+	Solenoid(SOL2_PRESS,1); 		// ПРИЖИМ
+	Pause(300);
+	Solenoid(SOL1_ALIGN,0); 		//откл выравниватель
+	Pause(300);
+			//проезжает N шагов от начала и останавливается перед штампом
+	stat = RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
+	Pause(300);
+	Solenoid(SOL2_PRESS,0); 		// ПРИЖИМ откл
 			/*
 			Pause(500);
 			Msg("Step motor revers...");
 	m6:		RunStepMotor(-100,120,1, 2, 0 ,100, "m6");//ШД назад
 			*/
-
 			Pause(500);
-
-	m9:		Solenoid(SOL3_GLUE,1,"m9");		//склейка
+	Solenoid(SOL3_GLUE,1);		//склейка
 
 	////////////////////////*отрезка*///////////////////////////////
 	/////////////////////////////////////////////////////////////////
 			Pause(500);
-
-			stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
-
-	m70:	stat = RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout,"m70");
+			stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout);
+	stat = RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout);
 			Pause(500);
-
-	m20:	stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
-
-
-			if (DEBUG == 1) {
-				Msg("fl_er = ");
-				Msgint(fl_er);
-			}
+	stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout);
+	if (DEBUG == 1) {
+		Msg("fl_er = ");
+		Msgint(fl_er);
+	}
 	////////////////////////////////////////////////////////////////
-
-
-			Pause(500);
+	Pause(500);
 			//старт ШД на N шагов из входных параметров главной функции
-	m8:		stat = RunStepMotor(Steps,120,1, -1, 0 ,timeout, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
-
-			Pause(500);
-
-	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
-			Pause(500);
-
-			if (DEBUG == 1) {
-				Msg("fl_er = ");
-				Msgint(fl_er);
-			}
-
+	stat = RunStepMotor(Steps,120,1, -1, 0 ,timeout); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	Pause(500);
+	Solenoid(SOL3_GLUE,0);			//склеивание отключить
+	Pause(500);
+	if (DEBUG == 1) {
+		Msg("fl_er = ");
+		Msgint(fl_er);
+	}
 	//////////////////штамповка///////////////////////////////////////
-			stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
-			Pause(500);
+	stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout);
+	Pause(500);
+	//шатмп вверх(закр)
+	stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout);//при закрытии исключить контроль по концевику или оптодатчику (-1)
+	Pause(500);
+	//штамп вниз(откр)
+	stat = RunMotor(MOT_SHTAMP, 1000, -1000,  900, -kv_sht_open, 0 , timeout);
+	Pause(500);
 			//шатмп вверх(закр)
-			stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
-			Pause(500);
-
-
-
-			//штамп вниз(откр)
-			stat = RunMotor(MOT_SHTAMP, 1000, -1000,  900, -kv_sht_open, 0 , timeout,"m0");
-			Pause(500);
-			//шатмп вверх(закр)
-			stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout,"m0");//при закрытии исключить контроль по концевику или оптодатчику (-1)
-			Pause(500);
-
-
-
-			//штамп вниз(откр)
-			stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout,"m0");
-			Pause(500);
-
-
+	stat = RunMotor(MOT_SHTAMP, 1000, 20000,  900, -1, 0 , timeout);//при закрытии исключить контроль по концевику или оптодатчику (-1)
+	Pause(500);
+	//штамп вниз(откр)
+	stat = RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , timeout);
+	Pause(500);
 	//////////////////////////////////////////////////////////////////
-			//выход из штампа
-			Pause(500);
-				//старт ШД на N шагов
-			stat = RunStepMotor(-2000,120,1, -1, 0 ,timeout, "m18");
-	m18:	stat = RunStepMotor(20000,120,1, -1, 0 ,timeout, "m18"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
-
-	m100:
+	//выход из штампа
+	Pause(500);
+	//старт ШД на N шагов
+	stat = RunStepMotor(-2000,120,1, -1, 0 ,timeout);
+	stat = RunStepMotor(20000,120,1, -1, 0 ,timeout); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
 
 	Event_err();
 		if (stat != MOT_OK) {
@@ -246,109 +199,74 @@ if (DEBUG == 1) {
 
 /*фото на магните без обрезки*/
 void Foto_to_magn(uint16_t Steps,uint8_t stor,uint8_t timeout){
-
-	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
-
-
-	m1:		WaitForOptoStatus(opto_print_in,1,30000,"m1");						// ожидание фото из принтера
-
-			Pause(1000);
-
-			if (DEBUG == 1) {
-			Msg("fl_er = ");
-			Msgint(fl_er);
-			}
-
-	m2:		Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
-			Pause(300);
-			Solenoid(SOL1_ALIGN,0,"m2");
-			Pause(300);
-			Solenoid(SOL1_ALIGN,1,"m2");
-
-			Pause(300);
-
-	m3:		Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
-
-			Pause(300);
-
-	m4:		Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
-
-
-			Pause(300);
-									//проезжает N шагов от начала и останавливается перед штампом
-	m5:		RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout, "m1"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
-
-			Pause(300);
-
-			Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ откл
-
+	StatusMotor	 stat;
+	stat = RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , timeout);	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
+	stat = WaitForOptoStatus(opto_print_in,1,30000);						// ожидание фото из принтера
+	Pause(1000);
+	if (DEBUG == 1) {
+		Msg("fl_er = ");
+		Msgint(fl_er);
+	}
+	Solenoid(SOL1_ALIGN,1); 		// ВЫРАВНИВАТЕЛЬ
+	Pause(300);
+	Solenoid(SOL1_ALIGN,0);
+	Pause(300);
+	Solenoid(SOL1_ALIGN,1);
+	Pause(300);
+	Solenoid(SOL2_PRESS,1); 		// ПРИЖИМ
+	Pause(300);
+	Solenoid(SOL1_ALIGN,0); 		//откл выравниватель
+	Pause(300);
+			//проезжает N шагов от начала и останавливается перед штампом
+	stat = RunStepMotor(STEP_TO_CUT,120,1, - 1, 0 ,timeout); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта 7500
+	Pause(300);
+	Solenoid(SOL2_PRESS,0); 		// ПРИЖИМ откл
 			/*
 			Pause(500);
 			Msg("Step motor revers...");
 	m6:		RunStepMotor(-100,120,1, 2, 0 ,100, "m6");//ШД назад
 			*/
-
-			Pause(500);
-
-	m9:		Solenoid(SOL3_GLUE,1,"m9");		//склейка
-
+	Pause(500);
+	Solenoid(SOL3_GLUE,1);		//склейка
 	////////////////////////*отрезка*///////////////////////////////
-	/////////////////////////////////////////////////////////////////
-			Pause(500);
-
-			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
-
-	m70:	RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout,"m70");
-			Pause(500);
-
-	m20:	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout,"m7");
-
-
-			if (DEBUG == 1) {
-			Msg("fl_er = ");
-			Msgint(fl_er);
-			}
+	Pause(500);
+	stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout);
+	stat = RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 ,timeout);
+	Pause(500);
+	stat = RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , timeout);
+	if (DEBUG == 1) {
+		Msg("fl_er = ");
+		Msgint(fl_er);
+	}
 	////////////////////////////////////////////////////////////////
-
-
-			Pause(500);
+	Pause(500);
 			//старт ШД на N шагов из входных параметров главной функции
-	m8:		RunStepMotor(Steps,120,1, -1, 0 ,timeout, "m8"); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
-
-			Pause(500);
-
-	m90:	Solenoid(SOL3_GLUE,0,"m9");			//склеивание отключить
-			Pause(500);
-
-			Event_err();
+	stat = RunStepMotor(Steps,120,1, -1, 0 ,timeout); //(steps,speed,accel,num_opt,status,timeout) 1 - закрыта, 0 - открыта
+	Pause(500);
+	Solenoid(SOL3_GLUE,0);			//склеивание отключить
+	Pause(500);
+	Event_err();
+	if (stat != MOT_OK) {
+				;
+	}
 }
 /*Программа печати фото без магнита*/
 void PrintFoto(void){
-	WaitForOptoStatus(opto_print_in,1,30000,"m1"); 		// Оптрон наличия бумаги
+	WaitForOptoStatus(opto_print_in,1,30000); 		// Оптрон наличия бумаги
 	Pause(1000);
-
-	Solenoid(SOL1_ALIGN,1,"m2"); 		// ВЫРАВНИВАТЕЛЬ
+	Solenoid(SOL1_ALIGN,1); 		// ВЫРАВНИВАТЕЛЬ
 	Pause(500);
-	Solenoid(SOL1_ALIGN,0,"m2");
+	Solenoid(SOL1_ALIGN,0);
 	Pause(500);
-	Solenoid(SOL1_ALIGN,1,"m2");
-
+	Solenoid(SOL1_ALIGN,1);
 	Pause(500);
-
-	Solenoid(SOL2_PRESS,1,"m3"); 		// ПРИЖИМ
-
+	Solenoid(SOL2_PRESS,1); 		// ПРИЖИМ
 	Pause(500);
-
-	Solenoid(SOL1_ALIGN,0,"m4"); 		//откл выравниватель
-
-	Solenoid(SOL3_GLUE,1,"m9");
-
-	RunStepMotor(30000,120,1, -2, 1 ,100, "m5");
-
-	Solenoid(SOL2_PRESS,0,"m3"); 		// ПРИЖИМ
-
-	Solenoid(SOL3_GLUE,0,"m9");
-
+	Solenoid(SOL1_ALIGN,0); 		//откл выравниватель
+	Solenoid(SOL3_GLUE,1);
+	RunStepMotor(30000,120,1, -2, 1 ,100);
+	Solenoid(SOL2_PRESS,0); 		// ПРИЖИМ
+	Solenoid(SOL3_GLUE,0);
 	Event_err();
 }
 
@@ -356,8 +274,8 @@ void PrintFoto(void){
 /*функция подачи магнита*/
 void MagnFrv(void){
 
-	m0:		RunMotor(MOT_MAGN, 1000, 10000,  4000, 2, 1 , 10,"m0");	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
-			Pause(500);
+	RunMotor(MOT_MAGN, 1000, 10000,  4000, 2, 1 , 10);	//подача магнита  (speed_kd,steps_ust,current,num_opt,status ,timeout)
+	Pause(500);
 }
 
 
@@ -367,7 +285,7 @@ void MagnFrv(void){
  * то установить флаг ошибки и выйти. При срабатывании шунтируется.
  * 1 - наличие фото, 0 - отсутствие
  */
-StatusMotor WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,const char* mt){
+StatusMotor WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout){
 	if(fl_er){
 	return MOT_ERROR;
 	}
@@ -375,7 +293,7 @@ StatusMotor WaitForOptoStatus(uint8_t num_opt,uint8_t status,uint16_t timeout,co
 	   if (DEBUG == 1) {
 		Msg("Wait opto");
 	   }
-		WriteMtk(mt);
+		//WriteMtk(mt);
 		//timeout = (timeout*1000);
 		count_100ms = 0;
 
@@ -420,12 +338,12 @@ status:
  * status: 1-вкл/0-выкл
  */
 
-void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
+void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status){
 	if(!fl_er){
 		if (DEBUG == 1) {
 			Msg("Sol_");
 		}
-		WriteMtk(mt);
+		//WriteMtk(mt);
 		if(status == 0) HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_SET);
 		else HAL_GPIO_WritePin(PORT,PIN,GPIO_PIN_RESET);
 	}
@@ -449,7 +367,7 @@ void Solenoid(GPIO_TypeDef* PORT,uint16_t  PIN,uint8_t status,const char* mt){
  * status: 0 - открыт, 1 - закрыт.
  * если оптодатчик указан со знаком минул, он не контролируется
  */
-StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout,const char* mt){
+StatusMotor RunStepMotor(int steps,uint8_t speed,uint32_t accel, int8_t num_opt, uint8_t status ,uint16_t timeout){
 if	(fl_er)	{
 	return MOT_ERROR;
 }
@@ -458,7 +376,7 @@ if (DEBUG == 1) {
 	Msg("Start Step mot");
 }
 
-	WriteMtk(mt);
+	//WriteMtk(mt);
 	if(steps > 0)HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_RESET); 	//если положительное число, то вперед
 	else HAL_GPIO_WritePin(DIR_STEP_MOT,GPIO_PIN_SET);				//иначе, назад
 
@@ -470,8 +388,6 @@ if (DEBUG == 1) {
 	accel_st = accel;
 */
 	timeout = (timeout*10);//Cек
-
-
 	step = abs(steps);
 	//старт ШД
 /*
@@ -479,7 +395,6 @@ if (DEBUG == 1) {
 	TIM1->CCR1 = pulse_T1;
 */
 	HAL_GPIO_WritePin( EN_STEP_MOT,GPIO_PIN_SET);				//включить ШД
-
 /*
  * ожидание открытия оптодатчика для обнуления счетчика шагов
  */
@@ -644,7 +559,7 @@ StatusMotor CalibrSteps(void){
  */
 
 
-StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B, uint16_t speed_kd, long steps_ust,  int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout,const char* mt){
+StatusMotor RunMotor(GPIO_TypeDef* DRAW_A,uint16_t  PIN_A, GPIO_TypeDef* DRAW_B, uint16_t  PIN_B, uint16_t speed_kd, long steps_ust,  int16_t current, int8_t num_opt, uint8_t status , uint16_t timeout){
 
 if(fl_er){
 return MOT_ERROR;
@@ -654,7 +569,7 @@ if (DEBUG == 1) {
 	Msg("Start KD");
 }
 
-WriteMtk(mt);
+//WriteMtk(mt);
 count_100ms = 0;		//обнулить счетчик таймаута.
 count_taho = 0;
 timeout = (timeout*10);
@@ -668,7 +583,6 @@ if(num_opt >= 0 ){							//если используется датчик
 		return MOT_OK;
 	}
 }
-
 	//задать направление вращения
 	if(steps_ust >= 0){
 		 HAL_GPIO_WritePin(DRAW_A,PIN_A,GPIO_PIN_SET);
@@ -709,7 +623,6 @@ if(num_opt >= 0 ){							//если используется датчик
 						return MOT_OK;
 						}
 					}
-
 						if(count_taho >= steps_ust){
 							if (DEBUG == 1) {
 								Msg("count_taho >= steps_ust");
@@ -729,14 +642,8 @@ if(num_opt >= 0 ){							//если используется датчик
 							}
 						return MOT_TIMEOUT;
 						}
-
 			}
-
-
-
 }
-
-
 
 /*
  * функция остановки колекторного двигателя
@@ -823,43 +730,43 @@ void executeCommand(string data_rx)
 			PrintFoto();													//печать фото
 	}
 	else if(command.find("MagnFrv()")!= string::npos){
-		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60,"m100");	//подача магнита
+		RunMotor(MOT_MAGN, 1000, 10000,  4000, opto_magn, 1 , 60);			//подача магнита
 	}
 	else if(command.find("CalibrSteps()")!= string::npos){
 			CalibrSteps();
 	}
-	else if(command.find("ShtampOpen()")!= string::npos){
-			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , 20,"m100");
+	else if(command.find("ShtampOpen()")!= string::npos){						//открыть штамп
+			RunMotor(MOT_SHTAMP, 1000, -20000,  2000, kv_sht_open, 0 , 20);
 	}
-	else if(command.find("CutUp()")!= string::npos){
-			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20,"m100");
+	else if(command.find("ShtampClose()")!= string::npos){						//закрыть штамп
+			RunMotor(MOT_SHTAMP, 1000, 5000,  100, -1, 0 , 20);
+	}
+	else if(command.find("CutUp()")!= string::npos){							//нож вверх
+			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 20);
 	}
 	else if(command.find("RunStepMot()")!= string::npos){
-			RunStepMotor(param[0],param[1],1, -1, 0 ,param[2], "m100");  	//команда запуска ШД на N шагов RunStepMot(N |-N)
+			RunStepMotor(param[0],param[1],1, -1, 0 ,param[2]);  				//команда запуска ШД на N шагов RunStepMot(N |-N)
 	}
-	else if(command.find("Request_fl_er()")!= string::npos){				//запрос флага ошибки
+	else if(command.find("Request_fl_er()")!= string::npos){					//запрос флага ошибки
 			Msgint(fl_er);
 	}
-	else if(command.find("Foto_to_magn()")!= string::npos){
+	else if(command.find("Foto_to_magn()")!= string::npos){						//наклеить фото без штампа
 			Foto_to_magn(param[0],param[1],param[2]);
 	}
-	else if(command.find("Cut()")!= string::npos){
-			RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 60,"m100");
-			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m100");
+	else if(command.find("Cut()")!= string::npos){								//отрезание ножом
+			RunMotor(MOT_CUT, 1000, 10000,  -1, kv_cut_down, 0 , 60);
+			RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60);
 	}
-	else if(command.find("TestSol()")!= string::npos){
+	else if(command.find("TestSol()")!= string::npos){							//запуск теста соленойдов
 			TestSol();
 	}
-	else if(command.find("TestInput()")!= string::npos){
+	else if(command.find("TestInput()")!= string::npos){						//запуск теста входов
 			TestInput();
 	}
-	else if(command.find("ShtampClose()")!= string::npos){
-			RunMotor(MOT_SHTAMP, 1000, 5000,  100, -1, 0 , 20,"m100");
-	}
-	else if(command.find("WriteEEPROM()")!= string::npos){
+	else if(command.find("WriteEEPROM()")!= string::npos){						//записать настройки
 			WriteEEPROM();
 	}
-	else if(command.find("ReadEEPROM()")!= string::npos){
+	else if(command.find("ReadEEPROM()")!= string::npos){						//прочитать настройки
 			ReadEEPROM();
 	}
 	else if(command.find("Set_count_magn()")!= string::npos){					//count_magn
@@ -874,7 +781,7 @@ void executeCommand(string data_rx)
 			buffer_i2c[4] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Timeout_wait_foto()")!= string::npos){
+	else if(command.find("Timeout_wait_foto()")!= string::npos){				//установить таймаут ожидания фото
 			buffer_i2c[6] = param[0];
 			WriteEEPROM();
 	}
@@ -882,7 +789,7 @@ void executeCommand(string data_rx)
 			buffer_i2c[8] = param[0];
 			WriteEEPROM();
 	}
-	else if(command.find("Timeout_shtamp()")!= string::npos){
+	else if(command.find("Timeout_shtamp()")!= string::npos){					//установить таймаут штампа
 			buffer_i2c[10] = param[0];
 			WriteEEPROM();
 	}
@@ -892,10 +799,10 @@ void executeCommand(string data_rx)
 			WriteEEPROM();
 	}
 
-	else if(command.find("Enable_debug()")!= string::npos){
+	else if(command.find("Enable_debug()")!= string::npos){						//включить отладочные сообщения
 			DEBUG = 1;
 	}
-	else if(command.find("Disable_debug()")!= string::npos){
+	else if(command.find("Disable_debug()")!= string::npos){					//отключить отладдочные сообщения
 			DEBUG = 0;
 	}
 	usb_buf_rx.clear();	//очистить переменную
@@ -906,7 +813,6 @@ void executeCommand(string data_rx)
 
 //функция формирования строковой переменной
 void ArreyRx(string data_rx){
-
 	if( data_rx.find(')') != string::npos){					//если найден символ окончания команды
 		usb_buf_rx += data_rx;
 		//Msg(usb_buf_rx);
@@ -947,8 +853,8 @@ void InitDev(void){
 	HAL_Delay(100);
 	HAL_GPIO_WritePin(Res_USB,GPIO_PIN_SET);
 
-	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60,"m0");	//открыть штамп
-	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60,"m7");			//поднять нож
+	RunMotor(MOT_SHTAMP, 1000, -20000,  3000, kv_sht_open, 0 , 60);	//открыть штамп
+	RunMotor(MOT_CUT, 1000, -10000,  -1, kv_cut_up, 0 , 60);		//поднять нож
 }
 
 
@@ -1036,9 +942,8 @@ HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16
 
 /*чтение структуры из EEPROM*/
 void ReadEEPROM(void){
-
 	HAL_StatusTypeDef stat;
-	/*сканер адресов готовых к соитию*/
+	/* сканер устройств. перебирает адреса, если есть устройство, то вывести адрес */
 /*
 	for(uint8_t i = 0; i < 255; i++){
 		stat = HAL_I2C_IsDeviceReady(&hi2c1, i, 1, 100);
@@ -1053,38 +958,28 @@ void ReadEEPROM(void){
 		}
 	}
 */
-
 	stat =  HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
 	if (HAL_OK == stat){
-		//Msg("IsDeveReady_OK");
 		Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
 
-		for(uint8_t i = 0; i < 10;i++){
-			Msgint(buffer_i2c[i]);
-			Pause(5);
+		if (DEBUG == 1) {
+			for(uint16_t i = 0; i < sizeof(buffer_i2c);i++){
+				Msgint(buffer_i2c[i]);
+				Pause(5);
+			}
 		}
 
 	}
 
-/*
-	else{
-		Msg("IsDeveReady_ERR");
-		Pause(5);
-		Msgint(stat);
-	}
-*/
+
+
+
+
+
 }
 
 /*запись массива в EEPROM*/
 void WriteEEPROM(void){
-	/*
-	for(uint8_t i = 0; i < 10;i++){
-			Msgint(buffer_i2c[i]);
-			Pause(5);
-		}
-	Msg("------------------");
-	*/
-
 	uint8_t tmp_reg[20] = {0xFF};
 	HAL_StatusTypeDef stat;
 	stat = HAL_I2C_IsDeviceReady(&hi2c1, adr_EEPROM, 1, 100);
@@ -1097,25 +992,25 @@ void WriteEEPROM(void){
 		Pause(10);
 		if (DEBUG == 1) {
 			stat = Read_I2C(&hi2c1, adr_EEPROM,strt_addr_ee,buffer_i2c, sizeof(buffer_i2c));
-			for(uint8_t i = 0; i < 10;i++){
+			for(uint16_t i = 0; i < sizeof(buffer_i2c); i++){
 				Msgint(buffer_i2c[i]);
 				Pause(5);
 			}
 		}
 	}
-
-
 }
 
 void EraseEEPROM(uint16_t len){
 	uint16_t bufer_zero[len] = {0xFFFF};
 	HAL_StatusTypeDef stat;
 	stat = Write_I2C(&hi2c1, adr_EEPROM, strt_addr_ee,(uint8_t*) bufer_zero, len);
-	//Msgint(stat);
+	if (DEBUG == 1) {
+		Msgint(stat);
+	}
 }
 
 void Event_err(void){
-	if (1 == fl_er){
+	if (fl_er){
 		HAL_GPIO_WritePin(SOL1_ALIGN,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(SOL2_PRESS,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(SOL3_GLUE,GPIO_PIN_SET);
@@ -1170,8 +1065,6 @@ void TestInput(void){
 				}
 				bitWrite(tmp_reg, 0, bitRead(input_UR, 0));
 			}
-
-
 			if (bitRead(tmp_reg, 1) != bitRead(input_UR, 1)) {
 				if (bitRead(input_UR, 1) == 0) {
 					Msg("Opto_ open");
@@ -1181,8 +1074,6 @@ void TestInput(void){
 				}
 				bitWrite(tmp_reg, 1, bitRead(input_UR, 1));
 			}
-
-
 			if (bitRead(tmp_reg, 2) != bitRead(input_UR, 2)) {
 				if (bitRead(input_UR, 2) == 0) {
 					Msg("Opto_magn open");
@@ -1192,8 +1083,6 @@ void TestInput(void){
 				}
 				bitWrite(tmp_reg, 2, bitRead(input_UR, 2));
 			}
-
-
 			if (bitRead(tmp_reg, 3) != bitRead(input_UR, 3)) {
 				if (bitRead(input_UR, 3) == 0) {
 					Msg("Cut_ open");
@@ -1201,22 +1090,36 @@ void TestInput(void){
 
 				bitWrite(tmp_reg, 3, bitRead(input_UR, 3));
 			}
-
 			if (bitRead(tmp_reg, 4) != bitRead(input_UR, 4)) {
 				if (bitRead(input_UR, 4) == 0) {
 					Msg("Sht_open");
 				}
 				bitWrite(tmp_reg, 4, bitRead(input_UR, 4));
 			}
-
-
 			if (bitRead(tmp_reg, 5) != bitRead(input_UR, 5)) {
 				if (bitRead(input_UR, 5) == 0) {
 				Msg("Cut_close");
 				}
 				bitWrite(tmp_reg, 5, bitRead(input_UR, 5));
 			}
-
+			if (bitRead(tmp_reg, 6) != bitRead(input_UR, 6)) {
+				if (bitRead(input_UR, 6) == 0) {
+					Msg("Res_6_open");
+				}
+				else{
+					Msg("Res_6_close");
+				}
+				bitWrite(tmp_reg, 6, bitRead(input_UR, 6));
+			}
+			if (bitRead(tmp_reg, 7) != bitRead(input_UR, 7)) {
+				if (bitRead(input_UR, 7) == 0) {
+					Msg("Res_7_open");
+				}
+				else{
+					Msg("Res_7_close");
+				}
+				bitWrite(tmp_reg, 7, bitRead(input_UR, 7));
+			}
 		Pause(100);
 	}
 }

@@ -167,28 +167,21 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   DWT_Init();
-
   //HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1); //генерация в режиме прерывания
   HAL_TIM_PWM_Start_IT(&htim2, TIM_CHANNEL_4); 		//запуск PWM UR LED-светодиодов с частотой 38 кГц
   HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_3);		//запуск режима захвата канала
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);			//запуск Ш�?М ШД
   HAL_TIM_Base_Start_IT(&htim4);					//запуск таймера 4 100мс
-
     //работа с инжекторными каналами
-    HAL_ADCEx_Calibration_Start(&hadc1);
-    HAL_ADCEx_InjectedStart_IT(&hadc1); 			// запускаем опрос инжект. каналов по прерыванию
-
+  HAL_ADCEx_Calibration_Start(&hadc1);
+  HAL_ADCEx_InjectedStart_IT(&hadc1); 			// запускаем опрос инжект. каналов по прерыванию
     //прочитать данные с EEPROM. если есть метка, то начать с неё.
+  ReadEEPROM();									//загрузить данные из EEPROM
 
-    ReadEEPROM();									//загрузить данные из EEPROM
-    PortRead(&hi2c1, adr_ur_sens,&input_UR);		//опрос оптодатчиков
-
-    HAL_Delay(1000);
-    Msg("Start program");
-
-    InitDev();
-
-
+  PortRead(&hi2c1, adr_ur_sens,&input_UR);		//опрос оптодатчиков
+  //HAL_Delay(1000);
+  Msg("Start program");
+  InitDev();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -196,9 +189,9 @@ int main(void)
   while (1)
   {
 
-	  	  	  if(!fl_run_prg) {						//если программа не выполняется и нет флага ошибки
+	  	  	  if (fl_rx == 1) {						//проверить есть ли данные для приема
 
-		  		  if(fl_rx == 1){					//проверить есть ли данные для приема
+		  		  if (!fl_run_prg) {				//если программа не выполняется и нет флага ошибки
 		  			  fl_run_prg = 1; 				//флаг выполнения программы
 		  			  executeCommand(usb_buf_rx);
 		  			  fl_run_prg = 0; 				//флаг выполнения программы

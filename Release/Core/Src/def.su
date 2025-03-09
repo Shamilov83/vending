@@ -1,34 +1,34 @@
-def.cpp:1222:1:void __static_initialization_and_destruction_0(int, int)	8	static
-def.cpp:745:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	16	static
-def.cpp:758:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	24	static
-def.cpp:908:6:void ArreyRx(std::string)	8	static
-def.cpp:962:6:void Msg(std::string)	16	dynamic
-def.cpp:981:6:void DWT_Init()	0	static
-def.cpp:987:6:void delay_micros(uint32_t)	0	static
-def.cpp:998:19:HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
-def.cpp:1013:19:HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
-def.cpp:1110:6:void EraseEEPROM(uint16_t)	24	dynamic
-def.cpp:1117:6:void Event_err()	8	static
-def.cpp:1127:6:void TestSol()	8	static
+def.cpp:1126:1:void __static_initialization_and_destruction_0(int, int)	8	static
+def.cpp:652:6:void StopMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t)	16	static
+def.cpp:665:6:void PortRead(I2C_HandleTypeDef*, uint8_t, uint8_t*)	24	static
+def.cpp:815:6:void ArreyRx(std::string)	8	static
+def.cpp:868:6:void Msg(std::string)	16	dynamic
+def.cpp:887:6:void DWT_Init()	0	static
+def.cpp:893:6:void delay_micros(uint32_t)	0	static
+def.cpp:904:19:HAL_StatusTypeDef Read_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+def.cpp:919:19:HAL_StatusTypeDef Write_I2C(I2C_HandleTypeDef*, uint16_t, uint16_t, uint8_t*, uint16_t)	40	static
+def.cpp:1013:6:void Event_err()	8	static
+def.cpp:1023:6:void TestSol()	8	static
 string_conversions.h:54:5:) [with _TRet = long int; _Ret = int; _CharT = char; _Base = {int}]	32	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = const char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
-def.cpp:1157:6:void TestInput()	232	static
-def.cpp:956:6:void WriteMtk(const char*)	32	static
-def.cpp:423:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t, const char*)	48	static
+def.cpp:1053:6:void TestInput()	328	static
+def.cpp:862:6:void WriteMtk(const char*)	32	static
+def.cpp:341:6:void Solenoid(GPIO_TypeDef*, uint16_t, uint8_t)	48	static
 basic_string.tcc:206:7:void std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::_M_construct(_InIterator, _InIterator, std::forward_iterator_tag) [with _FwdIterator = char*; _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]	24	static
-def.cpp:770:8:std::string convertCommandToIntList(std::string&, int*)	136	static
-def.cpp:974:6:void Msgint(int)	72	static
-def.cpp:1038:6:void ReadEEPROM()	16	static
-def.cpp:1079:6:void WriteEEPROM()	56	static
-def.cpp:370:13:StatusMotor WaitForOptoStatus(uint8_t, uint8_t, uint16_t, const char*)	104	static
-def.cpp:452:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t, const char*)	152	static
-def.cpp:326:6:void PrintFoto()	32	static
-def.cpp:647:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t, const char*)	176	static
-def.cpp:357:6:void MagnFrv()	40	static
-def.cpp:925:6:void InitDev()	56	static
-def.cpp:121:6:void Main_func(uint16_t, uint8_t, uint8_t)	176	static
-def.cpp:248:6:void Foto_to_magn(uint16_t, uint8_t, uint8_t)	128	static
-def.cpp:568:13:StatusMotor CalibrSteps()	40	static
-def.cpp:800:6:void executeCommand(std::string)	192	static,ignoring_inline_asm
-def.cpp:1222:1:cpp)	8	static
-def.cpp:1222:1:cpp)	8	static
+def.cpp:677:8:std::string convertCommandToIntList(std::string&, int*)	136	static
+def.cpp:880:6:void Msgint(int)	72	static
+def.cpp:944:6:void ReadEEPROM()	16	static
+def.cpp:1004:6:void EraseEEPROM(uint16_t)	24	dynamic
+def.cpp:976:6:void WriteEEPROM()	48	static
+def.cpp:288:13:StatusMotor WaitForOptoStatus(uint8_t, uint8_t, uint16_t)	96	static
+def.cpp:370:13:StatusMotor RunStepMotor(int, uint8_t, uint32_t, int8_t, uint8_t, uint16_t)	152	static
+def.cpp:254:6:void PrintFoto()	16	static
+def.cpp:562:13:StatusMotor RunMotor(GPIO_TypeDef*, uint16_t, GPIO_TypeDef*, uint16_t, uint16_t, long int, int16_t, int8_t, uint8_t, uint16_t)	176	static
+def.cpp:275:6:void MagnFrv()	32	static
+def.cpp:831:6:void InitDev()	48	static
+def.cpp:111:6:void Main_func(uint16_t, uint8_t, uint8_t)	160	static
+def.cpp:201:6:void Foto_to_magn(uint16_t, uint8_t, uint8_t)	112	static
+def.cpp:483:13:StatusMotor CalibrSteps()	40	static
+def.cpp:707:6:void executeCommand(std::string)	176	static,ignoring_inline_asm
+def.cpp:1126:1:cpp)	8	static
+def.cpp:1126:1:cpp)	8	static

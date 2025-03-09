@@ -39,16 +39,21 @@ typedef struct _exit_error{
 }exit_error;
 
 /*имена элементов массива*/
-#define count_magn 				*(uint16_t*)buffer_i2c[0]
-#define current_shtamp_close 	*(uint16_t*)buffer_i2c[2]
-#define steps_to_cut 			*(uint16_t*)buffer_i2c[4]
-#define timeout_wait_foto 		*(uint16_t*)buffer_i2c[6]
-#define timeout_wait_magn		*(uint16_t*)buffer_i2c[8]
-#define timeout_stamp 			*(uint16_t*)buffer_i2c[10]
-#define timeout_sm_to_cut 		*(uint16_t*)buffer_i2c[12]
-#define timeout_sm_to_sht 		*(uint16_t*)buffer_i2c[14]
-#define pulse_pwm				*(uint16_t*)buffer_i2c[16]
-#define voltage_pwr				*(uint16_t*)buffer_i2c[18]
+#define count_magn				*(uint16_t*)&buffer_i2c[0]
+#define current_shtamp_close	*(uint16_t*)&buffer_i2c[2]
+#define steps_to_cut			*(uint16_t*)&buffer_i2c[4]
+#define timeout_wait_foto		*(uint16_t*)&buffer_i2c[6]
+#define timeout_wait_magn		*(uint16_t*)&buffer_i2c[8]
+#define timeout_stamp			*(uint16_t*)&buffer_i2c[10]
+#define timeout_sm_to_cut		*(uint16_t*)&buffer_i2c[12]
+#define timeout_sm_to_sht		*(uint16_t*)&buffer_i2c[14]
+#define pulse_pwm				*(uint16_t*)&buffer_i2c[16]
+#define voltage_pwr				*(uint16_t*)&buffer_i2c[18]
+
+
+
+
+
 
 extern I2C_HandleTypeDef hi2c1;
 //флаги

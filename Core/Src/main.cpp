@@ -64,6 +64,7 @@ using namespace std;
 extern void executeCommand(string data_rx);
 extern string usb_buf_rx;
 extern void Msg(string);
+extern uint8_t flag_error;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -113,7 +114,7 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc)
 
     if(cod_ADC_PW <= 3500){
     	//Write_I2C(&hi2c1, adr_EEPROM, 0x10, (unsigned char*)mtk,8);			//записать шаг в EEPROM
-    	fl_er = 1;	//выставить флаг ошибки
+    	flag_error = 1;	//выставить флаг ошибки
     }
  }
 
@@ -189,7 +190,7 @@ int main(void)
   while (1)
   {
 
-	  	  	  if (fl_rx == 1) {						//проверить есть ли данные для приема
+	  	  	  if (flag_error == 1) {						//проверить есть ли данные для приема
 
 		  		  if (!fl_run_prg) {				//если программа не выполняется и нет флага ошибки
 		  			  fl_run_prg = 1; 				//флаг выполнения программы

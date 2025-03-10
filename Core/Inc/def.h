@@ -2,7 +2,7 @@
  * def.h
  *
  *  Created on: 25 янв. 2022 г.
- *      Author: shamilov
+ *  Author: Shamilov
  */
 /*
 #ifdef __cplusplus
@@ -21,24 +21,24 @@ extern "C" {
 #define DWT_CONTROL *(volatile unsigned long *)0xE0001000
 #define SCB_DEMCR   *(volatile unsigned long *)0xE000EDFC
 
-#define Pause	HAL_Delay		//Так удобнее
-#define TIMEOUT 10				//таймаут (Сек.)
-#define STEP_TO_CUT 7450		//количество шагов ШД до отрезки
+#define Pause	HAL_Delay			//Так удобнее
+#define TIMEOUT 10					//таймаут (Сек.)
+#define STEP_TO_CUT 7450			//количество шагов ШД до отрезки
 
-/*битовые операции*/
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)											//Читает бит под номером bit в числе value
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))											//Включает (ставит 1) бит под номером bit в числе value
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))										//Выключает (ставит 0) бит под номером bit в числе value
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))	//Ставит бит под номером bit в состояние bitvalue (0 или 1) в числе value
-#define bit(b) (1UL << (b))								`										//Возвращает 2 в степени bit
+/* битовые операции */
+#define bitRead(value, bit) 			(((value) >> (bit)) & 0x01)								//Читает бит под номером bit в числе value
+#define bitSet(value, bit) 				((value) |= (1UL << (bit)))								//Включает (ставит 1) бит под номером bit в числе value
+#define bitClear(value, bit) 			((value) &= ~(1UL << (bit)))							//Выключает (ставит 0) бит под номером bit в числе value
+#define bitWrite(value, bit, bitvalue) 	(bitvalue ? bitSet(value, bit) : bitClear(value, bit))	//Ставит бит под номером bit в состояние bitvalue (0 или 1) в числе value
+#define bit(b) 							(1UL << (b))								`			//Возвращает 2 в степени bit
 
-/*объявление типа данных exit_error*/
-typedef struct _exit_error{
+/* объявление типа данных exit_error */
+typedef struct _exit_error {
 	uint8_t fl_er;					//флаг завершения с ошибкой
 	char mtk;						//имя метки где остановилась программа(здесь нужен массив символов)
-}exit_error;
+} exit_error;
 
-/*имена элементов массива*/
+/* имена элементов массива */
 #define count_magn				*(uint16_t*)&buffer_i2c[0]
 #define current_shtamp_close	*(uint16_t*)&buffer_i2c[2]
 #define steps_to_cut			*(uint16_t*)&buffer_i2c[4]
@@ -49,10 +49,6 @@ typedef struct _exit_error{
 #define timeout_sm_to_sht		*(uint16_t*)&buffer_i2c[14]
 #define pulse_pwm				*(uint16_t*)&buffer_i2c[16]
 #define voltage_pwr				*(uint16_t*)&buffer_i2c[18]
-
-
-
-
 
 
 extern I2C_HandleTypeDef hi2c1;
